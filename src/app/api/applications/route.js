@@ -91,7 +91,7 @@ export async function POST(request) {
             };
 
             const result = await db
-            .collection("application")
+            .collection("applications")
             .insertOne(newApplication);
 
             return Response.json({
