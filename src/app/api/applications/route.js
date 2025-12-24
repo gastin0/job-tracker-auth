@@ -118,22 +118,22 @@ export async function PUT(request) {
         const { id, ...updates } = body;
         
         if (!id) {
-            return new Response(
-                JSON.stringify({ error: "ID is required" }),
+            return Response.json(
+                { error: "ID is required" },
                 { status: 400 }
-        );
+            )
         }
 
-        if (updates.status && !ALLOWED_STATUS.includes(updates.status)) {
-            return new Response(
-                JSON.stringify({ error: "Invalid status value" }),
+        if (updates.applicationStatus && !ALLOWED_APPLICATION_STATUS.includes(updates.applicationStatus)) {
+            return Response.json(
+                { error: "Invalid application status" },
                 { status: 400 }
             )
         }
         
-        if (updates.workType && !ALLOWED_WORK_TYPE.includes(updates.workType)) {
-            return new Response(
-                JSON.stringify({ error: "Invalid work type" }),
+        if (updates.workArrangement && !ALLOWED_WORK_ARRANGEMENT.includes(updates.workArrangement)) {
+            return Response.json(
+                { error: "Invalid work arrangement" },
                 { status: 400}
             );
         }
@@ -148,10 +148,10 @@ export async function PUT(request) {
             { $set: updates}
         );
         
-        return new Response({ message: "Application updated!" });
+        return Response.json({ message: "Application updated!" });
     } catch (error) {
-        return new Response(
-            JSON.stringify({ error: error.message }),
+        return Response.json(
+            { error: error.message },
             { status: 500 }
         );
     }
@@ -162,13 +162,13 @@ export async function DELETE(request) {
         const { id } = await request.json();
         
         if (!id) {
-            return new Response(
-                JSON.stringify({ error: "ID is required!" }),
+            return Response.json(
+                { error: "ID is required"},
                 { status: 400 }
             )
         }
         
-        const cliente = await clientPromise;
+        const client = await clientPromise;
         const db = client.db("job_tracker");
         
         await db
@@ -177,9 +177,9 @@ export async function DELETE(request) {
         
         return Response.json({ message: "Application deleted!" });
     } catch (error) {
-        return new Response(
-            JSON.stringify({ error: error.message }),
+        return Response.json(
+            { error: error.message },
             { status: 500 }
-        )
+        );
     }
 }
