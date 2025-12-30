@@ -1,19 +1,6 @@
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
-import { COMPILER_INDEXES } from "next/dist/shared/lib/constants";
-
-
-const ALLOWED_APPLICATION_STATUS = [
-    "applied",
-    "in_progress",
-    "rejected",
-];
-
-const ALLOWED_WORK_ARRANGEMENT = [
-    "remote",
-    "hybrid",
-    "on-site",
-];
+import { ALLOWED_APPLICATION_STATUS, ALLOWED_WORK_ARRANGEMENT } from "@/lib/constants";
 
 
 export async function GET() {
