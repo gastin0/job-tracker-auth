@@ -29,6 +29,17 @@ export async function GET() {
 }
 
 export async function POST(request) {
+    const adminSecret = request.headers.get("x-admin-secret");
+
+    if (adminSecret !== process.env.ADMIN_SECRET) {
+        return new Response(
+            JSON.stringify({
+                error: "Unauthorized"
+            }),
+            { status: 401 }
+        );
+    }
+
     try {
             const body = await request.json();
 
