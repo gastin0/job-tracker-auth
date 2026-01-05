@@ -1,8 +1,10 @@
-export function isAdmin() {
-    if (typeof window == "undefined") {
-        return false;
-    }
+import { ADMIN_STORAGE_KEY } from "./authConstants";
 
-    const secret = localStorage.getItem("admin_secret");
-    return secret === process.env.NEXT_ADMIN_SECRET;
+export function isAdmin() {
+    const secret = localStorage.getItem(ADMIN_STORAGE_KEY);
+    return Boolean(secret);
+}
+
+export function logoutAdmin() {
+    localStorage.removeItem(ADMIN_STORAGE_KEY);
 }

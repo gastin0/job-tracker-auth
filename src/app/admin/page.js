@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ADMIN_STORAGE_KEY } from "@/lib/authConstants";
 
 export default function AdmminLoginPage() {
     const router = useRouter();
@@ -12,7 +13,7 @@ export default function AdmminLoginPage() {
         e.preventDefault();
 
         if (adminKeyInput === process.env.NEXT_PUBLIC_ADMIN_SECRET) {
-            localStorage.setItem("admin_secret", adminKeyInput);
+            localStorage.setItem(ADMIN_STORAGE_KEY, adminKeyInput);
             router.push("/applications/new");
         } else {
             setAuthErrorMessage("Invalid Administrator Credentials.");
@@ -23,7 +24,7 @@ export default function AdmminLoginPage() {
         <div>
             <h1>Administrator Login</h1>
 
-            <form action="">
+            <form onSubmit={handleSubmit}>
                 <input
                     type="password"
                     placeholder="Administrator Key"
@@ -31,6 +32,8 @@ export default function AdmminLoginPage() {
                     onChange={(e) => setAdminKeyInput(e.target.value)}
                     required
                 />
+
+                <button type="submit">Log In</button>
             </form>
 
             {authErrorMessage && <p>{authErrorMessage}</p>}

@@ -1,7 +1,10 @@
+import { headers } from "next/headers";
+
 async function getApplications() {
-    const res = await fetch("api/applications", {
-        cache: "no-store",
-    });
+    const res = await fetch(
+        new URL("/api/applications", "http://localhost:3000"),
+        { cache: "no-store"}
+    );
 
     if (!res.ok) {
         throw new Error("Failed to fetch applications.");
@@ -20,7 +23,7 @@ export default async function ApplicationsPage() {
 
             <ul>
                 {applications.map((app) => (
-                    <li key={app._id}>
+                    <li key={app._id.toString()}>
                         {app.company} - {app.status} ({app.type})
                     </li>
                 ))}

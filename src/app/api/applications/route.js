@@ -14,12 +14,12 @@ export async function GET() {
         .sort({ appliedDate: -1 })
         .toArray();
 
-        const result = applications.map((doc) => ({
-            ...doc,
-            _id: doc._id.toString(),
+        const responseData = applications.map(({ _id, ...rest }) => ({
+            _id: _id.toString(),
+            ...rest,
         }));
 
-        return Response.json(result);
+        return Response.json(responseData);
     } catch (error) {
         return new Response(
             JSON.stringify({ error: error.message }),
