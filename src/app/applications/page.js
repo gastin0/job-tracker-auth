@@ -13,6 +13,10 @@ async function getApplications() {
     return res.json();
 }
 
+function upperCase(value) {
+    return value ? value.toUpperCase() : "";
+}
+
 
 export default async function ApplicationsPage() {
     const applications = await getApplications();
@@ -37,13 +41,13 @@ export default async function ApplicationsPage() {
                     </thead>
                     <tbody>
                         {applications.map((app) => (
-                            <tr key={app._id} className="border-b border-slate-700 hover:bg-slate-800/60">
+                            <tr key={app._id} className="border-b border-slate-700 hover:bg-slate-600/60">
                                 <td className="px-4 py-3 text-slate-900 font-bold">{app.companyName}</td>
                                 <td className="px-4 py-3 text-slate-900">{app.jobTitle}</td>
                                 <td className="px-4 py-3 text-slate-900 capitalize">{app.workArrangement}</td>
                                 <td className="px-4 py-3">
                                     <span
-                                        className={`inline-block px-2 py-1 rounded text-xs font-medium
+                                        className={`inline-block px-2 py-1 rounded text-xs font-medium w-full
                                         ${
                                             app.applicationStatus === "applied"
                                             ? "bg-blue-900 text-blue-200"
@@ -51,7 +55,7 @@ export default async function ApplicationsPage() {
                                             ? "bg-yellow-900 text-yellow-200"
                                             : "bg-red-900 text-red-200"
                                         }`}
-                                    >{app.applicationStatus.replace("_", " ")}</span>
+                                    >{upperCase(app.applicationStatus.replace("_", " "))}</span>
                                 </td>
                                 <td className="px-4 py-3 text-slate-900">
                                     {new Date(app.applicationDate).toISOString().split("T")[0]}
