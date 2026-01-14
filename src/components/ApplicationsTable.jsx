@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 
 export default function ApplicationsTable({ applications, isAdmin, onDelete }) {
-    console.log("isAdmin:", isAdmin);
     function formatStatus(value) {
         return value ? value.replace("_", " ").toUpperCase() : "";
     }
@@ -40,11 +39,6 @@ export default function ApplicationsTable({ applications, isAdmin, onDelete }) {
             </div>
 
             <div className="overflow-x-auto">
-                {applications.length === 0 && (
-                    <div className="text-slate-400 text-sm">
-                        No applications found.
-                    </div>
-                )}
                 <table className="w-full border-collapse text-sm">
                     <thead>
                         <tr className="bg-slate-800 border-b text-slate-200">
@@ -95,7 +89,7 @@ export default function ApplicationsTable({ applications, isAdmin, onDelete }) {
                                         <button
                                             type="button"
                                             onClick={() => onDelete(application._id)}
-                                            className="cursor-pointer hover:opacity-80"
+                                            className="relative group cursor-pointer hover:opacity-80"
                                         >
                                             <Image src="/icons/delete.svg" alt="Delete" width={16} height={16}></Image>
                                             <span className="
@@ -103,7 +97,7 @@ export default function ApplicationsTable({ applications, isAdmin, onDelete }) {
                                                 rounded bg-slate-800 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100
                                                 transition pointer-events-none shadow-md
                                             ">
-                                                Edit
+                                                Delete
                                             </span>
                                         </button>
                                     </td>
