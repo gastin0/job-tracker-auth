@@ -12,6 +12,8 @@ export default async function ApplicationPage() {
     const applications = await res.json();
 
     return (
-        < ApplicationsClient applications={applications} />
+        <>
+            < ApplicationsClient applications={applications} />
+        </>
     )
 }

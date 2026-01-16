@@ -23,20 +23,7 @@ export default function ApplicationsTable({ applications, isAdmin, onDelete }) {
                     Add Data
                 </Link>
             )} */}
-            <div className="flex items-center justify-between mb-6">
-                <h1 className="text-3xl font-semibold text-blue-900 tracking-tight">
-                    Work Applications
-                </h1>
-
-                {isAdmin && (
-                    <Link
-                        href="/applications/new"
-                        className="inline-flex items-center bg-blue-900 hover:bg-blue-800 text-white px-6 py-2 rounded font-medium text-sm"
-                    >
-                        Add Data
-                    </Link>
-                )}
-            </div>
+            
 
             <div className="overflow-x-auto">
                 <table className="w-full border-collapse text-sm">

@@ -6,17 +6,20 @@ import ApplicationsTable from "./ApplicationsTable";
 import ApplicationsTableSkeleton from "./ApplicationsTableSkeleton";
 import { ADMIN_HEADER_KEY, ADMIN_STORAGE_KEY } from "@/lib/authConstants";
 
-export default function ApplicationsClient({ applications }){
+export default function ApplicationsClient({ applications }) {
     const router = useRouter();
     const [isAdmin, setIsAdmin] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState("all");
+    const [mounted, setMounted] = useState(false);
 
     const filteredApplications = statusFilter === "all"
         ? applications
         : applications.filter((app) => app.applicationStatus === statusFilter);
 
     useEffect(() => {
+        setMounted(true);
+
         const adminSecret = localStorage.getItem(ADMIN_STORAGE_KEY);
         setIsAdmin(Boolean(adminSecret));
     }, []);
@@ -37,7 +40,7 @@ export default function ApplicationsClient({ applications }){
     }, [applications]);
 
     async function handleDelete(applicationId) {
-        
+
 
         const confirmed = window.confirm(
             "Are you sure you want to delete this application? This action cannot be undone."
@@ -60,48 +63,64 @@ export default function ApplicationsClient({ applications }){
 
     if (!filteredApplications || filteredApplications.length === 0) {
         return (
-                <div className="mt-12 text-center text-gray-500">
-                    <h2 className="text-lg font-semibold text-gray-700">No Applications yet</h2>
-                    <p className="mt-2">Job application you add will appear here</p>
+            <div className="mt-12 text-center text-gray-500">
+                <h2 className="text-lg font-semibold text-gray-700">No Applications yet</h2>
+                <p className="mt-2">Job application you add will appear here</p>
 
-                    {isAdmin && (
-                        <a 
+                {mounted && isAdmin && (
+                    <a
                         href="/applications/new"
                         className="inline-block mt-4 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                        >
-                            Add your first applications
-                        </a>
-                    )}
-                </div>
+                    >
+                        Add your first applications
+                    </a>
+                )}
+            </div>
         );
     }
 
     return (
         <div>
-            <div className="">
-                    <label
-                        htmlFor="statusFilter"
-                        className="text-sm font-medium text-gray-700"
-                    >
-                        Status:
-                    </label>
-    
-                    <select 
-                        id="statusFilter"
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
-                    >
-                        <option value="all">All</option>
-                        <option value="applied">Applied</option>
-                        <option value="in_progress">In progress</option>
-                        <option value="rejected">Rejected</option>
-                    </select>
+            <div>
+                <div className="flex items-center justify-between mb-6">
+                    <h1 className="text-3xl font-semibold text-blue-900 tracking-tight">
+                        Work Applications
+                    </h1>
+
+                    {mounted && isAdmin && (
+                        <Link
+                            href="/applications/new"
+                            className="inline-flex items-center bg-blue-900 hover:bg-blue-800 text-white px-6 py-2 rounded font-medium text-sm"
+                        >
+                            Add Data
+                        </Link>
+                    )}
+                </div>
             </div>
-    
+            <div className="mt-4 mb-4 flex item-center gap-2">
+                <label
+                    htmlFor="statusFilter"
+                    className="text-sm font-medium text-gray-700"
+                >
+                    Status:
+                </label>
+
+                <select
+                    id="statusFilter"
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
+                >
+                    <option value="all">All</option>
+                    <option value="applied">Applied</option>
+                    <option value="in_progress">In progress</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
+
             <ApplicationsTable
                 applications={filteredApplications}
-                isAdmin={isAdmin}
+                isAdmin={mounted && isAdmin}
                 onDelete={handleDelete}
             />
         </div>
