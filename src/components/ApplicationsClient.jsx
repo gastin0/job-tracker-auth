@@ -1,20 +1,24 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import ApplicationsTable from "./ApplicationsTable";
 import ApplicationsFilters from "./ApplicationsFilters";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import ApplicationsTableSkeleton from "./ApplicationsTableSkeleton";
 import { ADMIN_HEADER_KEY, ADMIN_STORAGE_KEY } from "@/lib/authConstants";
 
 export default function ApplicationsClient({ applications }) {
     const router = useRouter();
+
     const [isAdmin, setIsAdmin] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState("all");
     const [arrangementFilter, setarrangementFilter] = useState("all");
     const [mounted, setMounted] = useState(false);
+    const [applicationPendingDeletion, setApplicationPendingDeletion] = useState(null);
+    const [isDeleteInProgress, setIsDeleteInProgress] = useState(false);
 
     const filteredApplications = applications.filter((app) => {
         const statusMatch = statusFilter === "all" || app.applicationStatus === statusFilter;
@@ -49,22 +53,56 @@ export default function ApplicationsClient({ applications }) {
         return <ApplicationsTableSkeleton />;
     }
 
-    async function handleDelete(applicationId) {
+    // async function handleDelete(applicationId) {
 
 
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this application? This action cannot be undone."
-        );
-        if (!confirmed) return;
+    //     const confirmed = window.confirm(
+    //         "Are you sure you want to delete this application? This action cannot be undone."
+    //     );
+    //     if (!confirmed) return;
 
-        await fetch(`/api/applications/${applicationId}`, {
-            method: "DELETE",
-            headers: {
-                [ADMIN_HEADER_KEY]: localStorage.getItem(ADMIN_STORAGE_KEY),
-            },
-        });
+    //     await fetch(`/api/applications/${applicationId}`, {
+    //         method: "DELETE",
+    //         headers: {
+    //             [ADMIN_HEADER_KEY]: localStorage.getItem(ADMIN_STORAGE_KEY),
+    //         },
+    //     });
 
-        router.refresh();
+    //     router.refresh();
+    // }
+
+    const handleDeleteRequest = (application) => {
+        setApplicationPendingDeletion(application);
+        console.log(application);
+    }
+
+    const handleDeleteConfirmation = async () => {
+        if (!applicationPendingDeletion) return;
+
+        const applicationId = applicationPendingDeletion._id;
+
+        try {
+            setIsDeleteInProgress(true);
+
+            await fetch(`/api/applications/${applicationId}`, {
+                method: "DELETE",
+                headers: {
+                    [ADMIN_HEADER_KEY]: localStorage.getItem(ADMIN_STORAGE_KEY),
+                },
+            });
+
+            setApplicationPendingDeletion(null);
+
+            router.refresh();
+        } catch (error) {
+            console.error("Failed to delete application", error);
+        } finally {
+            setIsDeleteInProgress(false);
+        }
+    };
+
+    const handleDeleteCancellation = () => {
+        setApplicationPendingDeletion(null);
     }
 
     function handleClearFilters() {
@@ -98,14 +136,39 @@ export default function ApplicationsClient({ applications }) {
                         onArrangementChange={setarrangementFilter}
                     />
                 </div>
-                
-                <ApplicationsTable
-                    applications={filteredApplications}
-                    totalCount={applications.length}
-                    onClearFilters={handleClearFilters}
-                    isAdmin={mounted && isAdmin}
-                    onDelete={handleDelete}
-                />
+
+                <div>
+                    <ApplicationsTable
+                        applications={filteredApplications}
+                        totalCount={applications.length}
+                        onClearFilters={handleClearFilters}
+                        isAdmin={mounted && isAdmin}
+                        onDelete={handleDeleteRequest}
+                    />
+                </div>
+                <>
+                    <ConfirmDeleteModal
+                        open={Boolean(applicationPendingDeletion)}
+                        title="Delete Application?"
+                        description={
+                            <>
+                                This will permanently delete the application for {" "}
+                                <span className="font-semibold text-black">
+                                    {applicationPendingDeletion?.companyName}
+                                </span>
+                                <p className="mt-2 text-sm text-red-600">
+                                    <span className="font-medium uppercase tracking-wide">
+                                        Caution:
+                                    </span>{" "}
+                                    This action cannot be undone.
+                                </p>
+                            </>
+                        }
+                        isLoading={isDeleteInProgress}
+                        onConfirm={handleDeleteConfirmation}
+                        onCancel={handleDeleteCancellation}
+                    />
+                </>
             </div>
         </div>
     )

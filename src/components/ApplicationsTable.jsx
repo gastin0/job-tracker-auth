@@ -109,7 +109,7 @@ export default function ApplicationsTable({ applications, isAdmin, onDelete, onC
                                         </Link>
                                         <button
                                             type="button"
-                                            onClick={() => onDelete(application._id)}
+                                            onClick={() => onDelete(application)}
                                             className="relative group cursor-pointer hover:opacity-80"
                                         >
                                             <Image src="/icons/delete.svg" alt="Delete" width={16} height={16}></Image>
