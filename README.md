@@ -4,7 +4,9 @@ A full-stack job application tracking app build with **Next.js App Router** and 
 
 > This project focuses on **clarity, correctness, and user experience**, rather than feature bloat.
 
-## Features
+---
+
+## ✨ Features
 - Public read-only application list
 - Admin-only CRUD opeations
 - Stateless REST API with proper HTTP semantics
@@ -16,50 +18,61 @@ A full-stack job application tracking app build with **Next.js App Router** and 
   - Server components (data fetching)
   - Client components (interactivity)
 
-## Tech Stack
+---
+
+## 🛠 Tech Stack
 - **Framework**: Next.js (App Router)
 - **Frontend**: React, Tailwind CSS
 - **Backend**: Next.js API Routes
 - **Database**: MongoDB Atlas
 - **Styling**: Tailwind CSS
-- **Deployment**: -
+- **Deployment**: --
 
-## Architecture Overview
+---
+
+## 🧱 Architecture Overview
 App Router Structure
-- Server Components are used for **data fetching and routing**
-- Client Componentshandle **state, hooks, and user interaction**
+- Server components are used for **data fetching and routing**
+- Client components handle **state, hooks, and user interaction**
 
 Example:
-- [`applications/page.jsx`](./src/app/applications/page.jsx) - server component (fetches data)
-- [`ApplicationsClient.jsx`](./src/app/components/ApplicationsClient.jsx) - client wrapper (filters, admin logic)
-- [`ApplicationsTable.jsx`](./src/app/components/ApplicationsTable.jsx) - presentational component
+- [`applications/page.jsx`](./src/app/applications/page.jsx)
+  → server component (fetches data)
+- [`ApplicationsClient.jsx`](./src/app/components/ApplicationsClient.jsx)
+  → client wrapper (filters, admin logic)
+- [`ApplicationsTable.jsx`](./src/app/components/ApplicationsTable.jsx)
+  → presentational component
 
-## Admin vs Public Access
+---
+
+## 🔐 Admin vs Public Access
 - The [`/applications`](./src/app/applications/) page is **public and read-only**
 - Admin-only UI (create, edit, delete) is conditionally enabled
 - Admin detection is handled **client-side** using a secret stored in `localStorage`
 - UI gating is hydration-safe using a `mounted` check
 
-This approach keeps the backend stateless while still allowing admin functionality for a personal project.
+This approach keeps the backend **stateless** while still allowing admin functionality for a personal project.
 
+---
 
-## API Design
+## 🔌 API Design
 All data operations are handled through RESTful API routes under:
 [`/api/applications`](./src/app/api/applications)
 
 Supported operations:
-- `GET` - fetch all applications
-- `POST` - create a new application
-- `PUT` - update an application
-- `DELETE` - delete an application
+- `GET` — fetch all applications
+- `POST` — create a new application
+- `PUT` — update an application
+- `DELETE` — delete an application
 
 The API uses:
 - Consistent request/response shapes
 - Proper ObjectId serialization
 - Idempotent behavior where applicable
 
+---
 
-## UX & Accessibility Highlights
+## ♿ UX & Accessibility Highlights
 - Custom delete confirmation modal
 - Keyboard navigation
   - Escape to close
@@ -70,8 +83,9 @@ The API uses:
 
 These choices were made intentionally to reflect **production-grade UX thinking**.
 
+---
 
-## Data Model
+## 📂 Data Model
 Each application follows a fixed schema:
 - `companyName`
 - `jobTitle`
@@ -82,20 +96,23 @@ Each application follows a fixed schema:
 
 Schema consistency is enforced across API and UI.
 
+---
 
 ## Getting Started
 ```bash
-git clone
+git clone <repository-url>
 cd job-tracker
 npm install
 npm run dev
 ```
 Create a `.env.local` file:
-```js
+```env
 MONGODB_URI=your_mongodb_connection_string
 ```
 
-## Project Scope & Trade-offs
+---
+
+## 📌 Project Scope & Trade-offs
 This project intentionally:
 - Does not include full authentication (JWT/session)
 - Uses admin gating instead of multi-user auth
@@ -103,11 +120,15 @@ This project intentionally:
 
 These trade-offs were made to prioritize **code clarity and maintainability** within limited scope.
 
-## Screenshots
+---
+
+## 📸 Screenshots
 
 --- LATER ---
 
-## Why This Project Exists
+---
+
+## 🧠 Why This Project Exists
 This project was built to demonstrate:
 - Practical full-stack development
 - Understanding of Next.js App Router constraints
