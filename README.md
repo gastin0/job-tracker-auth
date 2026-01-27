@@ -1,4 +1,4 @@
-# JOB APPLICATION TRACKER
+# Job Application Tracker
 
 A full-stack job application tracking app build with **Next.js App Router** and **MongoDB**, designed to demonstrate clean architecture, RESTful APIs, and thoughtful UX for real-world CRUD workflows.
 
@@ -30,12 +30,12 @@ App Router Structure
 - Client Componentshandle **state, hooks, and user interaction**
 
 Example:
-- [`applications/page.jsx`](.src/app/applications/page.js) - server component (fetches data)
-- [`ApplicationsClient.jsx`](.src/app/components/ApplicationsClient.jsx) - client wrapper (filters, admin logic)
-- [`ApplicationsTable.jsx`](.src/app/components/ApplicationsTable.jsx) - presentational component
+- [`applications/page.jsx`](./src/app/applications/page.jsx) - server component (fetches data)
+- [`ApplicationsClient.jsx`](./src/app/components/ApplicationsClient.jsx) - client wrapper (filters, admin logic)
+- [`ApplicationsTable.jsx`](./src/app/components/ApplicationsTable.jsx) - presentational component
 
 ## Admin vs Public Access
-- The [`/applications`](.src/app/applications/) page is **public and read-only**
+- The [`/applications`](./src/app/applications/) page is **public and read-only**
 - Admin-only UI (create, edit, delete) is conditionally enabled
 - Admin detection is handled **client-side** using a secret stored in `localStorage`
 - UI gating is hydration-safe using a `mounted` check
@@ -45,7 +45,7 @@ This approach keeps the backend stateless while still allowing admin functionali
 
 ## API Design
 All data operations are handled through RESTful API routes under:
-[`/api/applications](.src/app/api/applications)
+[`/api/applications`](./src/app/api/applications)
 
 Supported operations:
 - `GET` - fetch all applications
