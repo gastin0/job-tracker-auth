@@ -1,8 +1,94 @@
-### JOB APPLICATION TRACKER
+# JOB APPLICATION TRACKER
 
 A full-stack job application tracking app build with Next.js App Router and MongoDB, designed to demonstrate clean architecture, RESTful APIs, and thoughtful UX for real-world CRUD workflows.
 
 This project focuses on clarity, correctness, and user experience, rather than feature bloat.
+
+## FEATURES
+- Public read-only application list
+- Admin-only CRUD opeations
+- Stateless REST API with proper HTTP semantics
+- Accessible destructive actions
+  Keyboard support (ESC key)
+  Focus trapping and focus restoration
+- Skeleton loading & empty states
+- Clean separation between:
+  Server components (data fetching)
+  Client components (interactivity)
+
+## TECH STACK
+- Framework: Next.js (App Router)
+- Frontend: React, Tailwind CSS
+- Backend: Next.js API Routes
+- Database: MongoDB Atlas
+- Styling: Tailwind CSS
+- Deployment: -
+
+## ARCHITECTURE OVERVIEW
+App Router Structure
+- Server Components are used for data fetching and routing
+- Client Componentshandle state, hooks, and user interaction
+
+Example:
+- applications/page.jsx - server component (fetches data)
+- ApplicationsClient.jsx - client wrapper (filters, admin logic)
+- ApplicationsTable.jsx - presentational component
+
+## Admin vs Public Access
+- The /applications page is public and read-only
+- Admin-only UI (create, edit, delete) is conditionally enabled
+- Admin detection is handled client-side using a secret stored in localStorage
+- UI gating is hydration-safe using a mounted check
+
+This approach keeps the backend stateless while still allowing admin functionality for a personal project.
+
+
+## API DESIGN
+All data operations are handled through RESTful API routes under:
+- GET - fetch all applications
+- POST - create a new application
+- PUT - update an application
+- DELETE - delete an application
+
+The API uses:
+- Consistent request/response shapes
+- Proper ObjectId serialization
+- Idempotent behavior where applicable
+
+
+## UX & ACCESSIBILITY HIGHLIGHTS
+- Custom delete confirmation modal
+- Keyboard navigation
+- - Escape to close
+  - Focus trapped inside modal
+  - Focus restored to triggering element
+- Explicit loading state for destructive actions
+- Skeleton loaders prevent layout shifts
+
+These choices were made intentionally to reflect production-grade UX thinking.
+
+
+## DATA MODEL
+Each application follows a fixed schema:
+- companyName
+- jobTitle
+- workArrangement
+- applicationStatus
+- applicationDate
+- notes
+
+Schema consistency is enforced across API and UI.
+
+
+## GETTING STARTED
+```bash
+git clone
+cd job-tracker
+npm install
+npm run dev
+```
+
+
 
 ```bash
 npm run dev
