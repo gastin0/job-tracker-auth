@@ -1,36 +1,156 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Job Application Tracker
 
-## Getting Started
+A full-stack job application tracking app build with **Next.js App Router** and **MongoDB**, designed to demonstrate clean architecture, RESTful APIs, and thoughtful UX for real-world CRUD workflows.
 
-First, run the development server:
+> This project focuses on **clarity, correctness, and user experience**, rather than feature bloat.
 
+---
+
+## ✨ Features
+- Public read-only application list
+- Admin-only CRUD opeations
+- Stateless REST API with proper HTTP semantics
+- Accessible destructive actions
+  - Keyboard support (ESC key)
+  - Focus trapping and focus restoration
+- Skeleton loading & empty states
+- Clean separation between:
+  - Server components (data fetching)
+  - Client components (interactivity)
+
+---
+
+## 🛠 Tech Stack
+- **Framework**: Next.js (App Router)
+- **Frontend**: React, Tailwind CSS
+- **Backend**: Next.js API Routes
+- **Database**: MongoDB Atlas
+- **Styling**: Tailwind CSS
+- **Deployment**: --
+
+---
+
+## 🧱 Architecture Overview
+App Router Structure
+- Server components are used for **data fetching and routing**
+- Client components handle **state, hooks, and user interaction**
+
+Example:
+- [`applications/page.jsx`](./src/app/applications/page.jsx)
+  → server component (fetches data)
+- [`ApplicationsClient.jsx`](./src/app/components/ApplicationsClient.jsx)
+  → client wrapper (filters, admin logic)
+- [`ApplicationsTable.jsx`](./src/app/components/ApplicationsTable.jsx)
+  → presentational component
+
+---
+
+## 🔐 Admin vs Public Access
+- The [`/applications`](./src/app/applications/) page is **public and read-only**
+- Admin-only UI (create, edit, delete) is conditionally enabled
+- Admin detection is handled **client-side** using a secret stored in `localStorage`
+- UI gating is hydration-safe using a `mounted` check
+
+This approach keeps the backend **stateless** while still allowing admin functionality for a personal project.
+
+---
+
+## 🔌 API Design
+All data operations are handled through RESTful API routes under:
+[`/api/applications`](./src/app/api/applications)
+
+Supported operations:
+- `GET` — fetch all applications
+- `POST` — create a new application
+- `PUT` — update an application
+- `DELETE` — delete an application
+
+The API uses:
+- Consistent request/response shapes
+- Proper ObjectId serialization
+- Idempotent behavior where applicable
+
+---
+
+## ♿ UX & Accessibility Highlights
+- Custom delete confirmation modal
+- Keyboard navigation
+  - Escape to close
+  - Focus trapped inside modal
+  - Focus restored to triggering element
+- Explicit loading state for destructive actions
+- Skeleton loaders prevent layout shifts
+
+These choices were made intentionally to reflect **production-grade UX thinking**.
+
+---
+
+## 📂 Data Model
+Each application follows a fixed schema:
+- `companyName`
+- `jobTitle`
+- `workArrangement`
+- `applicationStatus`
+- `applicationDate`
+- `notes`
+
+Schema consistency is enforced across API and UI.
+
+---
+
+## 🚀 Getting Started
 ```bash
+git clone <repository-url>
+cd job-tracker
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+Create a `.env.local` file:
+```env
+MONGODB_URI=your_mongodb_connection_string
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## 📌 Project Scope & Trade-offs
+This project intentionally:
+- Does not include full authentication (JWT/session)
+- Uses admin gating instead of multi-user auth
+- Focuses on architecture, UX, and correctness
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+These trade-offs were made to prioritize **code clarity and maintainability** within limited scope.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 📸 Screenshots
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Public Applications View
+![Public applications list](./screenshots/applications-public.png)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Admin View (CRUD Enabled)
+![Admin applications view](./screenshots/applications-admin.png)
 
-## Deploy on Vercel
+*Admin-only actions are conditionally enabled on the same route.*
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Delete Confirmation Modal
+![Delete confirmation modal](./screenshots/delete-confirmation-modal.gif)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+*Keyboard-accessible destructive action flow with focus management.*
+
+### Application Form
+![Application form](./screenshots/application-form.png)
+
+### Empty State
+![Empty state](./screenshots/empty-state.png)
+*Empty state clearly indicates that no results match the active filters and provide a reset action.*
+
+---
+
+## 🧠 Why This Project Exists
+This project was built to demonstrate:
+- Practical full-stack development
+- Understanding of Next.js App Router constraints
+- Clean REST API design
+- UX and accessibility awareness
+
+It is actively iterated as part of a learning and portfolio process
