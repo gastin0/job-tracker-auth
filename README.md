@@ -1,8 +1,8 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+### JOB APPLICATION TRACKER
 
-## Getting Started
+A full-stack job application tracking app build with Next.js App Router and MongoDB, designed to demonstrate clean architecture, RESTful APIs, and thoughtful UX for real-world CRUD workflows.
 
-First, run the development server:
+This project focuses on clarity, correctness, and user experience, rather than feature bloat.
 
 ```bash
 npm run dev
