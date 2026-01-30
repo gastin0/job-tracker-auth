@@ -45,7 +45,6 @@ Each application follows a fixed schema:
 
 ---
 
-
 ## 📸 Screenshots
 
 ### Public Applications View
@@ -67,7 +66,6 @@ Each application follows a fixed schema:
 ### Empty State
 ![Empty state](./screenshots/empty-state.png)
 *Empty state clearly indicates that no results match the active filters and provide a reset action.*
-
 
 ---
 
@@ -107,7 +105,6 @@ For detailed architectural decisions, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ---
 
-
 ## 🗑️ Delete UX
 - Custom confirmation modal (now `window.confirm`)
 - Focus trapping + Escape handling
@@ -126,15 +123,15 @@ This project uses **GitHub Actions** for automated code quality:
 
 View the [CI workflow](.github/workflows/ci.yml) for details.
 
+---
+
 ## 🐳 Docker Support
 Docker configuration lives in a dedicated branch:
 ```bash
 branch: job-tracker-docker
 ```
 
-
 ---
-
 
 ## 📌 Project Scope & Trade-offs
 This project intentionally:
@@ -145,7 +142,6 @@ This project intentionally:
 These trade-offs were made to prioritize **code clarity and maintainability** within limited scope.
 
 ---
-
 
 ## 🚀 Getting Started
 ```bash
@@ -160,7 +156,6 @@ Create a `.env.local` file:
 MONGODB_URI=your_mongodb_connection_string
 ADMIN_SECRET=your_admin_secret
 ```
-
 
 ---
 
