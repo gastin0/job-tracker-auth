@@ -76,7 +76,7 @@ export default function ConfirmDeleteModal({
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [open, isLoading, oncancel]);
+    }, [open, isLoading, onCancel]);
 
     if (!open || !hasMounted) return null;
 
