@@ -1,6 +1,6 @@
 # Job Application Tracker
 
-[![CI](https://github.com/gastin0/job-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/gastin0/job-tracker/actions/workflows/ci.yml)
+[![CI](https://github.com/gastin0/job-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/gastin0/job-tracker/actions/workflows/ci.yml) ![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)
 
 A full-stack job application tracking app build with **Next.js App Router**, **MongoDB**, and **Tailwind CSS**. Designed as a portfolio project with clean architecture, RESTful APIs, admin/read-only separation, and thoughtful UX for real-world CRUD workflows.
 
@@ -14,6 +14,7 @@ A full-stack job application tracking app build with **Next.js App Router**, **M
 - **MongoDB Atlas** with shared `clientPromise` connection pattern
 - **Admin vs read-only UI separation** (client-side gating)
 - **Accessible UX** (keyboard navigation, focus management)
+- **Continous Integration** (automated linting via Github Actions)
 - **Dockerized setup** (via dedicated branch)
 
 ---
@@ -24,7 +25,7 @@ A full-stack job application tracking app build with **Next.js App Router**, **M
 - **Backend**: Next.js API Routes
 - **Database**: MongoDB Atlas
 - **Styling**: Tailwind CSS
-- **Toolong**: ESLint, PostCSS
+- **Toolong**: ESLint, PostCSS, GitHub Actions (CI)
 - **Deployment-ready**: Docker
 
 ---
@@ -116,6 +117,14 @@ For detailed architectural decisions, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 - Focus restored to triggering button
 
 ---
+
+## ✅ Continous Integration
+This project uses **GitHub Actions** for automated code quality:
+- Linting runs automatically on every push and pull request
+- ESLint checks ensure code standards are maintained
+- Pre-merge validation prevents broken code from entering main branch
+
+View the [CI workflow](.github/workflows/ci.yml) for details.
 
 ## 🐳 Docker Support
 Docker configuration lives in a dedicated branch:
