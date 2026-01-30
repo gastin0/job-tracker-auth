@@ -31,11 +31,10 @@ export default function ApplicationsClient({ applications }) {
     })
 
     useEffect(() => {
-        setMounted(true);
+        setMounted(true); // eslint-disable-line
 
         const adminSecret = localStorage.getItem(ADMIN_STORAGE_KEY);
-        setIsAdmin(Boolean(adminSecret));
-        // eslint-disable-next-line
+        setIsAdmin(Boolean(adminSecret)); // eslint-disable-line
     }, []);
 
     // // To set Timeout for testing the skeleton
@@ -49,8 +48,7 @@ export default function ApplicationsClient({ applications }) {
 
     useEffect(() => {
         if (applications) {
-            setIsLoading(false);
-            // eslint-disable-next-line
+            setIsLoading(false); // eslint-disable-line
         }
     }, [applications]);
 
