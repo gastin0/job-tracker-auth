@@ -20,7 +20,7 @@ export default function ConfirmDeleteModal({
 
     useEffect(() => {
         setHasMounted(true);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/set-state-in-effect
     }, []);
 
     useEffect(() => {

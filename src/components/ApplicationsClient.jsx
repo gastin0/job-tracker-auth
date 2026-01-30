@@ -35,7 +35,7 @@ export default function ApplicationsClient({ applications }) {
 
         const adminSecret = localStorage.getItem(ADMIN_STORAGE_KEY);
         setIsAdmin(Boolean(adminSecret));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/set-state-in-effect
     }, []);
 
     // // To set Timeout for testing the skeleton
@@ -50,7 +50,7 @@ export default function ApplicationsClient({ applications }) {
     useEffect(() => {
         if (applications) {
             setIsLoading(false);
-            // eslint-disable-next-line react-hooks/exhaustive-deps
+            // eslint-disable-next-line react-hooks/set-state-in-effect
         }
     }, [applications]);
 
