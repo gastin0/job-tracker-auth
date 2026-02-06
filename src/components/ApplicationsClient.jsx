@@ -2,26 +2,29 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import ApplicationsTable from "./ApplicationsTable";
 import ApplicationsFilters from "./ApplicationsFilters";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import ApplicationsTableSkeleton from "./ApplicationsTableSkeleton";
-import { ADMIN_HEADER_KEY, ADMIN_STORAGE_KEY } from "@/lib/authConstants";
 
 export default function ApplicationsClient({ applications }) {
     const router = useRouter();
 
-    const [isAdmin, setIsAdmin] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState("all");
     const [arrangementFilter, setarrangementFilter] = useState("all");
-    const [mounted, setMounted] = useState(false);
     const [applicationPendingDeletion, setApplicationPendingDeletion] = useState(null);
     const [deleteState, setDeleteState] = useState("idle");     // "idle" || "loading" || "success"
 
     const deleteTriggerRef = useRef(null);
     const tableRef = useRef(null);
+
+    const { data: session, status } = useSession();
+
+    const isAdmin = session?.user?.role === "admin";
+    const isLoadingSession = status === "loading";
 
     const filteredApplications = applications.filter((app) => {
         const statusMatch = statusFilter === "all" || app.applicationStatus === statusFilter;
@@ -29,13 +32,6 @@ export default function ApplicationsClient({ applications }) {
 
         return statusMatch && arrangementMatch;
     })
-
-    useEffect(() => {
-        setMounted(true); // eslint-disable-line
-
-        const adminSecret = localStorage.getItem(ADMIN_STORAGE_KEY);
-        setIsAdmin(Boolean(adminSecret)); // eslint-disable-line
-    }, []);
 
     // // To set Timeout for testing the skeleton
     // useEffect(() => {
@@ -72,9 +68,6 @@ export default function ApplicationsClient({ applications }) {
 
             await fetch(`/api/applications/${applicationId}`, {
                 method: "DELETE",
-                headers: {
-                    [ADMIN_HEADER_KEY]: localStorage.getItem(ADMIN_STORAGE_KEY),
-                },
             });
 
             await new Promise(r => setTimeout(r, 1200));
@@ -127,7 +120,7 @@ export default function ApplicationsClient({ applications }) {
                         Work Applications
                     </h1>
 
-                    {mounted && isAdmin && (
+                    {!isLoadingSession && isAdmin && (
                         <Link
                             href="/applications/new"
                             className="inline-flex items-center bg-blue-900 hover:bg-blue-800 text-white px-6 py-2 rounded font-medium text-sm"
@@ -151,12 +144,12 @@ export default function ApplicationsClient({ applications }) {
                         applications={filteredApplications}
                         totalCount={applications.length}
                         onClearFilters={handleClearFilters}
-                        isAdmin={mounted && isAdmin}
+                        isAdmin={!isLoadingSession && isAdmin}
                         onDelete={handleDeleteRequest}
                     />
                 </div>
                 <>
-                    {mounted && (<ConfirmDeleteModal
+                    {!isLoadingSession && (<ConfirmDeleteModal
                         open={Boolean(applicationPendingDeletion)}
                         state={deleteState}
                         title="Delete Application?"

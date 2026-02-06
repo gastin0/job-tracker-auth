@@ -1,6 +1,7 @@
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { ALLOWED_APPLICATION_STATUS, ALLOWED_WORK_ARRANGEMENT } from "@/lib/constants";
+import { auth } from "@/auth";
 
 
 export async function GET() {
@@ -9,10 +10,10 @@ export async function GET() {
         const db = client.db("job_tracker");
 
         const applications = await db
-        .collection("applications")
-        .find({})
-        .sort({ appliedDate: -1 })
-        .toArray();
+            .collection("applications")
+            .find({})
+            .sort({ appliedDate: -1 })
+            .toArray();
 
         const responseData = applications.map(({ _id, ...rest }) => ({
             _id: _id.toString(),
@@ -29,78 +30,76 @@ export async function GET() {
 }
 
 export async function POST(request) {
-    const adminSecret = request.headers.get("x-admin-secret");
-
-    if (adminSecret !== process.env.ADMIN_SECRET) {
-        return new Response(
-            JSON.stringify({
-                error: "Unauthorized"
-            }),
-            { status: 401 }
-        );
-    }
-
     try {
-            const body = await request.json();
+        const session = await auth();
 
-            const {
-                companyName,
-                jobTitle,
-                workArrangement,
-                applicationStatus,
-                applicationDate,
-                notes = "",
-                isPublic = false,
-            } = body;
+        if (!session || session.user.role !== "admin") {
+            return new Response.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
 
-            if (!companyName || !jobTitle || !workArrangement || !applicationStatus) {
-                return new Response(
-                    JSON.stringify({ error: "Missing required field" }),
-                    { status: 400 }
-                )
-            }
+        const body = await request.json();
 
-            if (!ALLOWED_APPLICATION_STATUS.includes(applicationStatus)) {
-                return new Response(
-                    JSON.stringify({ error: "Invalid application status" }),
-                    { status: 400 }
-                );
-            }
+        const {
+            companyName,
+            jobTitle,
+            workArrangement,
+            applicationStatus,
+            applicationDate,
+            notes = "",
+            isPublic = false,
+        } = body;
 
-            if (!ALLOWED_WORK_ARRANGEMENT.includes(workArrangement)) {
-                return new Response(
-                    JSON.stringify({ error: "Invalid work arrangement" }),
-                    { status: 400 }
-                );
-            }
+        if (!companyName || !jobTitle || !workArrangement || !applicationStatus) {
+            return new Response(
+                JSON.stringify({ error: "Missing required field" }),
+                { status: 400 }
+            )
+        }
 
-            const client = await clientPromise;
-            const db = client.db("job_tracker");
+        if (!ALLOWED_APPLICATION_STATUS.includes(applicationStatus)) {
+            return new Response(
+                JSON.stringify({ error: "Invalid application status" }),
+                { status: 400 }
+            );
+        }
 
-            const newApplication = {
-                companyName,
-                jobTitle,
-                workArrangement,
-                applicationStatus,
-                applicationDate: applicationDate
+        if (!ALLOWED_WORK_ARRANGEMENT.includes(workArrangement)) {
+            return new Response(
+                JSON.stringify({ error: "Invalid work arrangement" }),
+                { status: 400 }
+            );
+        }
+
+        const client = await clientPromise;
+        const db = client.db("job_tracker");
+
+        const newApplication = {
+            companyName,
+            jobTitle,
+            workArrangement,
+            applicationStatus,
+            applicationDate: applicationDate
                 ? new Date(applicationDate)
                 : new Date(),
-                notes,
-                isPublic,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            };
+            notes,
+            isPublic,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        };
 
-            const result = await db
+        const result = await db
             .collection("applications")
             .insertOne(newApplication);
 
-            return Response.json({
-                message: "Application created!",
-                id: result.insertedId.toString(),
-            },
+        return Response.json({
+            message: "Application created!",
+            id: result.insertedId.toString(),
+        },
             { status: 201 }
-            );
+        );
     } catch (error) {
         return new Response(
             JSON.stringify({ error: error.message }),
@@ -111,10 +110,18 @@ export async function POST(request) {
 
 export async function PUT(request) {
     try {
+        const session = await auth();
+
+        if (!session || session.user.role !== "admin") {
+            return Response.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
 
         const body = await request.json();
         const { id, ...updates } = body;
-        
+
         if (!id) {
             return Response.json(
                 { error: "ID is required" },
@@ -128,24 +135,24 @@ export async function PUT(request) {
                 { status: 400 }
             )
         }
-        
+
         if (updates.workArrangement && !ALLOWED_WORK_ARRANGEMENT.includes(updates.workArrangement)) {
             return Response.json(
                 { error: "Invalid work arrangement" },
-                { status: 400}
+                { status: 400 }
             );
         }
-        
+
         updates.updatedAt = new Date();
-        
+
         const client = await clientPromise;
         const db = client.db("job_tracker");
-        
+
         await db.collection("applications").updateOne(
             { _id: new ObjectId(id) },
-            { $set: updates}
+            { $set: updates }
         );
-        
+
         return Response.json({ message: "Application updated!" });
     } catch (error) {
         return Response.json(
@@ -157,22 +164,31 @@ export async function PUT(request) {
 
 export async function DELETE(request) {
     try {
+        const session = await auth();
+
+        if (!session || session.user.role !== "admin") {
+            return Response.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            )
+        }
+
         const { id } = await request.json();
-        
+
         if (!id) {
             return Response.json(
-                { error: "ID is required"},
+                { error: "ID is required" },
                 { status: 400 }
             )
         }
-        
+
         const client = await clientPromise;
         const db = client.db("job_tracker");
-        
+
         await db
-        .collection("applications")
-        .deleteOne({ _id: new ObjectId(id) });
-        
+            .collection("applications")
+            .deleteOne({ _id: new ObjectId(id) });
+
         return Response.json({ message: "Application deleted!" });
     } catch (error) {
         return Response.json(
