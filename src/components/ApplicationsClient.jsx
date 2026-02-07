@@ -2,14 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import ApplicationsTable from "./ApplicationsTable";
 import ApplicationsFilters from "./ApplicationsFilters";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import ApplicationsTableSkeleton from "./ApplicationsTableSkeleton";
 
-export default function ApplicationsClient({ applications }) {
+export default function ApplicationsClient({ applications, isAdmin }) {
     const router = useRouter();
 
     const [isLoading, setIsLoading] = useState(true);
@@ -19,12 +18,6 @@ export default function ApplicationsClient({ applications }) {
     const [deleteState, setDeleteState] = useState("idle");     // "idle" || "loading" || "success"
 
     const deleteTriggerRef = useRef(null);
-    const tableRef = useRef(null);
-
-    const { data: session, status } = useSession();
-
-    const isAdmin = session?.user?.role === "admin";
-    const isLoadingSession = status === "loading";
 
     const filteredApplications = applications.filter((app) => {
         const statusMatch = statusFilter === "all" || app.applicationStatus === statusFilter;
@@ -120,9 +113,9 @@ export default function ApplicationsClient({ applications }) {
                         Work Applications
                     </h1>
 
-                    {!isLoadingSession && isAdmin && (
+                    {isAdmin && (
                         <Link
-                            href="/applications/new"
+                            href="/admin/applications/new"
                             className="inline-flex items-center bg-blue-900 hover:bg-blue-800 text-white px-6 py-2 rounded font-medium text-sm"
                         >
                             Add Data
@@ -144,12 +137,12 @@ export default function ApplicationsClient({ applications }) {
                         applications={filteredApplications}
                         totalCount={applications.length}
                         onClearFilters={handleClearFilters}
-                        isAdmin={!isLoadingSession && isAdmin}
+                        isAdmin={isAdmin}
                         onDelete={handleDeleteRequest}
                     />
                 </div>
                 <>
-                    {!isLoadingSession && (<ConfirmDeleteModal
+                    <ConfirmDeleteModal
                         open={Boolean(applicationPendingDeletion)}
                         state={deleteState}
                         title="Delete Application?"
@@ -170,7 +163,7 @@ export default function ApplicationsClient({ applications }) {
                         isLoading={deleteState === "loading"}
                         onConfirm={handleDeleteConfirmation}
                         onCancel={handleDeleteCancellation}
-                    />)}
+                    />
                 </>
             </div>
         </div>

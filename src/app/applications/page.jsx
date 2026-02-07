@@ -1,19 +1,15 @@
+import { getAllApplications } from "@/lib/applicationsRepo";
 import ApplicationsClient from "@/components/ApplicationsClient";
 
-export default async function ApplicationPage() {
-    const res = await fetch("http://localhost:3000/api/applications", {
-        cache: "no-store",
-    });
-
-    if (!res.ok) {
-        throw new Error("Failed to fetch applications.");
-    }
-
-    const applications = await res.json();
+export default async function ApplicationsPage() {
+    const applications = await getAllApplications();
 
     return (
         <>
-            < ApplicationsClient applications={applications} />
+            <ApplicationsClient
+                applications={applications}
+                isAdmin={false}
+            />
         </>
     )
 }

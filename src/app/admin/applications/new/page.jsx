@@ -1,88 +1,91 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { ADMIN_HEADER_KEY, ADMIN_STORAGE_KEY } from "@/lib/authConstants";
+import { useState } from "react";
+import { useSession } from "next-auth/react";
 
-export default function EditApplicationForm({ applicationId }) {
-    const router = useRouter();
+export default function NewApplicationPage() {
+    const { data: session, status } = useSession();
+    const isAdmin = session?.user?.role === "admin";
+
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const [applicationFormData, setApplicationFormData] = useState({
-        companyName: "",
-        jobTitle: "",
-        workArrangement: "",
-        applicationStatus: "",
-        applicationDate: "",
-        notes: "",
-    });
-
-    useEffect(() => {
-        async function loadApplicationData() {
-            const response = await fetch(`/api/applications/${applicationId}`);
-            const applicationData = await response.json();
-
-            setApplicationFormData({
-                companyName: applicationData.companyName || "",
-                jobTitle: applicationData.jobTitle || "",
-                workArrangement: applicationData.workArrangement || "",
-                applicationStatus: applicationData.applicationStatus || "",
-                applicationDate: applicationData.applicationDate || "",
-                notes: applicationData.notes || "",
-            });
-        }
-
-        loadApplicationData();
-    }, [applicationId]);
-
-    function handleInputChange(event) {
-        const { name, value } = event.target;
-
-        setApplicationFormData(previousState => ({
-            ...previousState,
-            [name]: value
-        }));
-    }
-
-    async function handleFormSubmit(event) {
-        event.preventDefault();
-        setIsSubmitting(true);
-
-        try {
-            await fetch(`/api/applications/${applicationId}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    [ADMIN_HEADER_KEY]: localStorage.getItem(`${ADMIN_STORAGE_KEY}`),
-                },
-                body: JSON.stringify(applicationFormData),
-            });
+    const [companyName, setCompanyName] = useState("");
+    const [jobTitle, setJobTitle] = useState("");
+    const [workArrangement, setWorkArrangement] = useState("");
+    const [applicationStatus, setApplicationStatus] = useState("");
+    const [applicationDate, setApplicationDate] = useState("");
+    const [notes, setNotes] = useState("");
     
-            router.push("/applications");
-            router.refresh();
-        } finally {
-            setIsSubmitting(false);
-        }
-        
+    if (status === "loading") {
+        return (
+            <div>
+                <h1>Loading....</h1>
+                <p>Checking session</p>
+            </div>
+        );
     }
+
+    if (!isAdmin) {
+        return null;
+    }
+
+    async function handleSubmit(e) {
+            e.preventDefault();
+            setIsSubmitting(true);
+
+            try {
+                const res = await fetch("/api/applications", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        companyName,
+                        jobTitle,
+                        workArrangement,
+                        applicationStatus,
+                        applicationDate,
+                        notes,
+                    }),
+                });
+    
+                if (!res.ok) {
+                    alert("Unauthorized or failed!");
+                    return;
+                }
+    
+                alert("Application recorded successfully!");
+    
+                setCompanyName("");
+                setJobTitle("");
+                setWorkArrangement("");
+                setApplicationStatus("");
+                setApplicationDate("");
+                setNotes("");
+            } finally {
+                setIsSubmitting(false);
+            }
+
+    }
+    
 
     return (
         <div className="min-h-screen flex items-start justify-center p-6">
             <div className="w-full max-w-xl bg-[rgb(var(--color-card))] rounded-lg shadow-md p-6">
                 <h1 className="text-2xl font-bold text-blue-900 mb-6 text-center">
-                    Edit Job Application
+                    Add Job Application
                 </h1>
             
-                <form onSubmit={handleFormSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-1">
                         <label className="text-sm font-medium">
                             Company Name
                         </label>
                         <input
-                            name="companyName" 
-                            value={applicationFormData.companyName}
-                            onChange={handleInputChange}
+                            type="text" 
                             placeholder="Company Name"
+                            value={companyName}
+                            onChange={(e) => setCompanyName(e.target.value)}
                             required
                             className="w-full rounded-md border px-3 py-2
                             focus:outline-none focus:ring-2 focus:ring-blue-600
@@ -95,10 +98,10 @@ export default function EditApplicationForm({ applicationId }) {
                             Job Title
                         </label>
                         <input 
-                            name="jobTitle"
-                            value={applicationFormData.jobTitle}
-                            onChange={handleInputChange}
+                            type="text"
                             placeholder="Job Title"
+                            value={jobTitle}
+                            onChange={(e) => setJobTitle(e.target.value)}
                             required
                             className="w-full rounded-md border px-3 py-2
                             focus:outline-none focus:ring-2 focus:ring-blue-600
@@ -111,9 +114,8 @@ export default function EditApplicationForm({ applicationId }) {
                             Work Arrangement
                         </label>
                         <select
-                            name="workArrangement"
-                            value={applicationFormData.workArrangement}
-                            onChange={handleInputChange}
+                            value={workArrangement}
+                            onChange={(e) => setWorkArrangement(e.target.value)}
                             required
                             className="w-full rounded-md border px-3 py-2
                             focus:outline-none focus:ring-2 focus:ring-blue-600
@@ -131,9 +133,8 @@ export default function EditApplicationForm({ applicationId }) {
                             Application Status
                         </label>
                         <select
-                            name="applicationStatus"
-                            value={applicationFormData.applicationStatus}
-                            onChange={handleInputChange}
+                            value={applicationStatus}
+                            onChange={(e) => setApplicationStatus(e.target.value)}
                             required
                             className="w-full rounded-md border px-3 py-2
                             focus:outline-none focus:ring-2 focus:ring-blue-600
@@ -151,9 +152,8 @@ export default function EditApplicationForm({ applicationId }) {
                     <div className="space-y-1">
                         <input
                             type="date"
-                            name="applicationDate"
-                            value={applicationFormData.applicationDate}
-                            onChange={handleInputChange}
+                            value={applicationDate}
+                            onChange={(e) => setApplicationDate(e.target.value)}
                             required
                             className="w-full rounded-md border px-3 py-2
                             focus:outline-none focus:ring-2 focus:ring-blue-600
@@ -162,10 +162,9 @@ export default function EditApplicationForm({ applicationId }) {
                     </div>
 
                     <textarea
-                        name="notes"
-                        value={applicationFormData.notes}
-                        onChange={handleInputChange}
                         placeholder="Notes (optional)"
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
                         rows={3}
                         className="w-full rounded-md border px-3 py-2 resize-none
                         focus:outline-none focus:ring-2 focus:ring-blue-600
@@ -186,11 +185,13 @@ export default function EditApplicationForm({ applicationId }) {
                         transition
                         "
                         >
-                        {isSubmitting ? "Saving Changes..." : "Confirm Edit"}
+                        {isSubmitting ? "Saving..." : "Save Application"}
                     </button>
 
                 </form>
             </div>
         </div>
     );
+
 }
+
