@@ -31,7 +31,7 @@ export async function getAllApplications() {
 
     const applications = await collection
     .find({})
-    .sort({ applicationDate: -1 })
+    .sort({ updatedAt: -1 })
     .toArray();
 
     return applications.map(app => ({
@@ -42,17 +42,38 @@ export async function getAllApplications() {
 
 export async function createApplication(data) {
     const collection = await getCollection();
-    const result = await collection.insertOne(data);
+
+    const now = new Date();
+
+    const document = {
+        ...data,
+        createdAt: now,
+        updatedAt: now
+    };
+
+    const result = await collection.insertOne(document);
+
     return result.insertedId.toString();
 }
 
 export async function updateApplication(id, data) {
     const collection = await getCollection();
 
-    await collection.updateOne(
+    const result = await collection.updateOne(
         { _id: new ObjectId(id) },
-        { $set: data }
+        {
+            $set: {
+                ...data,
+                updatedAt: new Date()
+            }
+        }
     );
+
+    return result;
+    // await collection.updateOne(
+    //     { _id: new ObjectId(id) },
+    //     { $set: data }
+    // );
 }
 
 export async function deleteApplication(id){
