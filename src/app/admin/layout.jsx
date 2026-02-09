@@ -1,9 +1,17 @@
-export default function AdminLayout ({ children }) {
+import { auth } from "@/auth";
+import { isAdminUser } from "@/lib/isAdminUser";
+import { redirect } from "next/navigation";
+import AdminHeader from "@/components/admin/AdminHeader";
+
+export default async function AdminLayout({ children }) {
+    const session = await auth();
+
+    if (!session || !isAdminUser(session)) {
+        redirect("/login");
+    }
     return (
         <div>
-            <div className="border-b p-4 text-sm text-gray-600">
-                Admin Area
-            </div>
+            <AdminHeader />
             {children}
         </div>
     )
