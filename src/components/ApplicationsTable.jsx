@@ -37,6 +37,7 @@ export default function ApplicationsTable({ applications, isAdmin, onDelete, onC
                             {isAdmin &&
                                 <td className="px-4 py-3 text-left font-medium">Actions</td>
                             }
+                            <th className="px-4 py-3 text-left font-medium">Updated at</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -123,6 +124,9 @@ export default function ApplicationsTable({ applications, isAdmin, onDelete, onC
                                         </button>
                                     </td>
                                 )}
+                                <td className="px-4 py-3 text-slate-900">
+                                    {new Date(application.updatedAt).toLocaleDateString("en-CA")}
+                                </td>
                             </tr>
                         )))}
                     </tbody>
