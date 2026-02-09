@@ -26,15 +26,6 @@ export default function ApplicationsClient({ applications, isAdmin }) {
         return statusMatch && arrangementMatch;
     })
 
-    // // To set Timeout for testing the skeleton
-    // useEffect(() => {
-    //     const timer = setTimeout(() => {
-    //         setIsLoading(false);
-    //     }, 2000);
-
-    //     return () => clearTimeout(timer);
-    // }, []);
-
     useEffect(() => {
         if (applications) {
             setIsLoading(false); // eslint-disable-line
