@@ -24,7 +24,7 @@ export async function PUT(request, context) {
 }
 
 export async function DELETE(request, context) {
-    const params = context.params;
+    const params = await context.params;
 
     await deleteApplication(params.id);
     return Response.json({ success: true });
