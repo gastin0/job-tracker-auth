@@ -8,7 +8,7 @@ import ApplicationsFilters from "./ApplicationsFilters";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import ApplicationsTableSkeleton from "./ApplicationsTableSkeleton";
 
-export default function ApplicationsClient({ applications, isAdmin }) {
+export default function ApplicationsClient({ applications, isAdmin, pagination }) {
     const router = useRouter();
 
     const [isLoading, setIsLoading] = useState(true);
@@ -18,6 +18,10 @@ export default function ApplicationsClient({ applications, isAdmin }) {
     const [deleteState, setDeleteState] = useState("idle");     // "idle" || "loading" || "success"
 
     const deleteTriggerRef = useRef(null);
+
+    const handlePageChange = (newPage) => {
+        router.push(`/applications?page=${newPage}`);
+    };
 
     const filteredApplications = applications.filter((app) => {
         const statusMatch = statusFilter === "all" || app.applicationStatus === statusFilter;
@@ -132,6 +136,27 @@ export default function ApplicationsClient({ applications, isAdmin }) {
                         onDelete={handleDeleteRequest}
                     />
                 </div>
+                    {pagination.totalPages > 1 && (
+                        <div>
+                            <button
+                                disabled={pagination.currentPage === 1}
+                                onClick={() => handlePageChange(pagination.currentPage - 1)}
+                                className="px-4 py-2 border rounded disabled:opacity-50"
+                            >
+                                Previous
+                            </button>
+                            <span>
+                                Page {pagination.currentPage} of {pagination.totalPages}
+                            </span>
+                            <button
+                                disabled={pagination.currentPage === 1}
+                                onClick={() => handlePageChange(pagination.currentPage - 1)}
+                                className="px-4 py-2 border rounded disabled:opacity-50"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
                 <>
                     <ConfirmDeleteModal
                         open={Boolean(applicationPendingDeletion)}

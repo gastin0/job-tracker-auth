@@ -7,8 +7,8 @@ const COLLECTION_NAME = "applications";
 async function getCollection() {
     const client = await clientPromise;
     return client
-    .db(DATABASE_NAME)
-    .collection(COLLECTION_NAME)
+        .db(DATABASE_NAME)
+        .collection(COLLECTION_NAME)
 }
 
 export async function getApplicationById(id) {
@@ -26,18 +26,33 @@ export async function getApplicationById(id) {
     };
 }
 
-export async function getAllApplications() {
+export async function getAllApplications({ page = 1, limit = 10 } = {}) {
     const collection = await getCollection();
 
-    const applications = await collection
-    .find({})
-    .sort({ updatedAt: -1 })
-    .toArray();
+    const skip = (page - 1) * limit;
 
-    return applications.map(app => ({
-        ...app,
-        _id: app._id.toString(),
-    }));
+    const totalCount = await collection.countDocuments();
+
+    const applications = await collection
+        .find({})
+        .sort({ updatedAt: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .toArray();
+
+    return {
+        data: applications.map((application) => ({
+            _id: application._id.toString(),
+            ...application,
+            _id: undefined,
+        })),
+        pagination: {
+            totalCount,
+            currentPage: page,
+            totalPages: Math.ceil(totalCount / limit),
+            pageSize: limit,
+        },
+    };
 }
 
 export async function createApplication(data) {
@@ -76,7 +91,7 @@ export async function updateApplication(id, data) {
     // );
 }
 
-export async function deleteApplication(id){
+export async function deleteApplication(id) {
     const collection = await getCollection();
 
     await collection.deleteOne({
