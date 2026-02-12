@@ -76,7 +76,7 @@ export default function ApplicationsTable({ applications, isAdmin, onDelete, onC
                             </tr>
                         ) : (
                         applications.map((application) => (
-                            <tr key={application._id} className="border-b border-slate-700 hover:bg-slate-600/60">
+                            <tr key={application.id} className="border-b border-slate-700 hover:bg-slate-600/60">
                                 <td className="px-4 py-3 text-slate-900 font-bold">{application.companyName}</td>
                                 <td className="px-4 py-3 text-slate-900">{application.jobTitle}</td>
                                 <td className="px-4 py-3 text-slate-900 capitalize">{application.workArrangement}</td>

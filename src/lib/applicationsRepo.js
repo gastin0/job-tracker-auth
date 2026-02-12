@@ -42,7 +42,7 @@ export async function getAllApplications({ page = 1, limit = 10 } = {}) {
 
     return {
         data: applications.map((application) => ({
-            _id: application._id.toString(),
+            id: application._id.toString(),
             ...application,
             _id: undefined,
         })),

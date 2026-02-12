@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import ApplicationsTable from "./ApplicationsTable";
@@ -10,6 +10,7 @@ import ApplicationsTableSkeleton from "./ApplicationsTableSkeleton";
 
 export default function ApplicationsClient({ applications, isAdmin, pagination }) {
     const router = useRouter();
+    const pathname = usePathname();
 
     const [isLoading, setIsLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState("all");
@@ -19,17 +20,21 @@ export default function ApplicationsClient({ applications, isAdmin, pagination }
 
     const deleteTriggerRef = useRef(null);
 
-    const handlePageChange = (newPage) => {
-        router.push(`/applications?page=${newPage}`);
-    };
-
+    
     const filteredApplications = applications.filter((app) => {
         const statusMatch = statusFilter === "all" || app.applicationStatus === statusFilter;
         const arrangementMatch = arrangementFilter === "all" || app.workArrangement === arrangementFilter;
-
+        
         return statusMatch && arrangementMatch;
     })
+    
+    const handlePageChange = (newPage) => {
+        const pageParams = new URLSearchParams(window.location.search);
+        pageParams.set("page", newPage);
 
+        router.push(`${pathname}?${pageParams.toString()}`);
+    };
+    
     useEffect(() => {
         if (applications) {
             setIsLoading(false); // eslint-disable-line
@@ -136,7 +141,7 @@ export default function ApplicationsClient({ applications, isAdmin, pagination }
                         onDelete={handleDeleteRequest}
                     />
                 </div>
-                    {pagination.totalPages > 1 && (
+                    {pagination && pagination.totalPages > 1 && (
                         <div>
                             <button
                                 disabled={pagination.currentPage === 1}
@@ -149,8 +154,8 @@ export default function ApplicationsClient({ applications, isAdmin, pagination }
                                 Page {pagination.currentPage} of {pagination.totalPages}
                             </span>
                             <button
-                                disabled={pagination.currentPage === 1}
-                                onClick={() => handlePageChange(pagination.currentPage - 1)}
+                                disabled={pagination.currentPage === pagination.totalPages}
+                                onClick={() => handlePageChange(pagination.currentPage + 1)}
                                 className="px-4 py-2 border rounded disabled:opacity-50"
                             >
                                 Next
