@@ -20,21 +20,21 @@ export default function ApplicationsClient({ applications, isAdmin, pagination }
 
     const deleteTriggerRef = useRef(null);
 
-    
+
     const filteredApplications = applications.filter((app) => {
         const statusMatch = statusFilter === "all" || app.applicationStatus === statusFilter;
         const arrangementMatch = arrangementFilter === "all" || app.workArrangement === arrangementFilter;
-        
+
         return statusMatch && arrangementMatch;
     })
-    
+
     const handlePageChange = (newPage) => {
         const pageParams = new URLSearchParams(window.location.search);
         pageParams.set("page", newPage);
 
         router.push(`${pathname}?${pageParams.toString()}`);
     };
-    
+
     useEffect(() => {
         if (applications) {
             setIsLoading(false); // eslint-disable-line
@@ -141,27 +141,37 @@ export default function ApplicationsClient({ applications, isAdmin, pagination }
                         onDelete={handleDeleteRequest}
                     />
                 </div>
-                    {pagination && pagination.totalPages > 1 && (
-                        <div>
-                            <button
-                                disabled={pagination.currentPage === 1}
-                                onClick={() => handlePageChange(pagination.currentPage - 1)}
-                                className="px-4 py-2 border rounded disabled:opacity-50"
-                            >
-                                Previous
-                            </button>
-                            <span>
-                                Page {pagination.currentPage} of {pagination.totalPages}
-                            </span>
-                            <button
-                                disabled={pagination.currentPage === pagination.totalPages}
-                                onClick={() => handlePageChange(pagination.currentPage + 1)}
-                                className="px-4 py-2 border rounded disabled:opacity-50"
-                            >
-                                Next
-                            </button>
-                        </div>
-                    )}
+                {pagination && pagination.totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-4 mt-6">
+                        <button
+                            disabled={pagination.currentPage === 1}
+                            onClick={() => handlePageChange(pagination.currentPage - 1)}
+                            className="
+                                px-4 py-1 border rounded-md font-medium
+                                border border-blue-900 text-blue-900
+                                hover:bg-blue-50 transition-colors
+                                disabled:opacity-40 disabled:cursor-not-allowed disabled:hover-bg-transparent
+                                "
+                        >
+                            Previous
+                        </button>
+                        <span>
+                            Page {pagination.currentPage} of {pagination.totalPages}
+                        </span>
+                        <button
+                            disabled={pagination.currentPage === pagination.totalPages}
+                            onClick={() => handlePageChange(pagination.currentPage + 1)}
+                            className="
+                                px-4 py-1 border rounded-md font-medium
+                                border border-blue-900 text-blue-900
+                                hover:bg-blue-50 transition-colors
+                                disabled:opacity-40 disabled:cursor-not-allowed disabled:hover-bg-transparent
+                                "
+                        >
+                            Next
+                        </button>
+                    </div>
+                )}
                 <>
                     <ConfirmDeleteModal
                         open={Boolean(applicationPendingDeletion)}
