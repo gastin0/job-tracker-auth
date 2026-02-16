@@ -27,7 +27,9 @@ export default function NotificationToast({
 
             return () => clearTimeout(timeout);
         }
-    }, [isVisible, duration, onClose]);
+        // onClose is intentionally omitted - we want the current reference when timeout fires
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isVisible, duration]);
 
     if (!shouldRender) return null;
 
