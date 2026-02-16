@@ -26,15 +26,25 @@ export async function getApplicationById(id) {
     };
 }
 
-export async function getAllApplications({ page = 1, limit = 10 } = {}) {
+export async function getAllApplications({ page = 1, limit = 10, status, arrangement } = {}) {
     const collection = await getCollection();
 
     const skip = (page - 1) * limit;
 
-    const totalCount = await collection.countDocuments();
+    const query = {};
+
+    if (status && status !== "all") {
+        query.applicationStatus = status;
+    }
+
+    if (arrangement && arrangement !== "all") {
+        query.workArrangement = arrangement;
+    }
+
+    const totalCount = await collection.countDocuments(query);
 
     const applications = await collection
-        .find({})
+        .find(query)
         .sort({ updatedAt: -1, createdAt: -1 })
         .skip(skip)
         .limit(limit)

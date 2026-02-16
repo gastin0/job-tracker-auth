@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import ApplicationsTable from "./ApplicationsTable";
@@ -8,15 +8,17 @@ import ApplicationsFilters from "./ApplicationsFilters";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import ApplicationsTableSkeleton from "./ApplicationsTableSkeleton";
 
-export default function ApplicationsClient({ applications, isAdmin, pagination }) {
+export default function ApplicationsClient({ applications, isAdmin, pagination, currentFilters }) {
     const router = useRouter();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
 
     const [isLoading, setIsLoading] = useState(true);
-    const [statusFilter, setStatusFilter] = useState("all");
-    const [arrangementFilter, setarrangementFilter] = useState("all");
     const [applicationPendingDeletion, setApplicationPendingDeletion] = useState(null);
     const [deleteState, setDeleteState] = useState("idle");     // "idle" || "loading" || "success"
+
+    const statusFilter = searchParams.get("status") || "all";
+    const arrangementFilter = searchParams.get("arrangement") || "all";
 
     const deleteTriggerRef = useRef(null);
 
@@ -28,11 +30,14 @@ export default function ApplicationsClient({ applications, isAdmin, pagination }
         return statusMatch && arrangementMatch;
     })
 
-    const handlePageChange = (newPage) => {
-        const pageParams = new URLSearchParams(window.location.search);
-        pageParams.set("page", newPage);
+    const updateQueryParams = (updates) => {
+        const params = new URLSearchParams(searchParams.toString());
 
-        router.push(`${pathname}?${pageParams.toString()}`);
+        Object.entries(updates).forEach(([key, value]) => {
+            params.set(key, value);
+        });
+
+        router.push(`${pathname}?${params.toString()}`);
     };
 
     useEffect(() => {
@@ -127,8 +132,18 @@ export default function ApplicationsClient({ applications, isAdmin, pagination }
                     <ApplicationsFilters
                         statusFilter={statusFilter}
                         arrangementFilter={arrangementFilter}
-                        onStatusChange={setStatusFilter}
-                        onArrangementChange={setarrangementFilter}
+                        onStatusChange={(value) => 
+                            updateQueryParams({
+                                status: value,
+                                page: 1,
+                            })
+                        }
+                        onArrangementChange={(value) =>
+                            updateQueryParams({
+                                arrangement: value,
+                                page: 1,
+                            })
+                        }
                     />
                 </div>
 
@@ -145,7 +160,9 @@ export default function ApplicationsClient({ applications, isAdmin, pagination }
                     <div className="flex items-center justify-center gap-4 mt-6">
                         <button
                             disabled={pagination.currentPage === 1}
-                            onClick={() => handlePageChange(pagination.currentPage - 1)}
+                            onClick={() =>
+                                updateQueryParams({ page: pagination.currentPage - 1 })
+                            }
                             className="
                                 px-4 py-1 border rounded-md font-medium
                                 border border-blue-900 text-blue-900
@@ -160,7 +177,9 @@ export default function ApplicationsClient({ applications, isAdmin, pagination }
                         </span>
                         <button
                             disabled={pagination.currentPage === pagination.totalPages}
-                            onClick={() => handlePageChange(pagination.currentPage + 1)}
+                            onClick={() =>
+                                updateQueryParams({ page: pagination.currentPage + 1 })
+                            }
                             className="
                                 px-4 py-1 border rounded-md font-medium
                                 border border-blue-900 text-blue-900
