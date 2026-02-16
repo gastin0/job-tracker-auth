@@ -1,30 +1,27 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import ApplicationsTable from "./ApplicationsTable";
 import ApplicationsFilters from "./ApplicationsFilters";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import ApplicationsTableSkeleton from "./ApplicationsTableSkeleton";
 
-export default function ApplicationsClient({ applications }) {
+export default function ApplicationsClient({ applications, isAdmin, pagination, currentFilters }) {
     const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
 
     const [isLoading, setIsLoading] = useState(true);
-    const [statusFilter, setStatusFilter] = useState("all");
-    const [arrangementFilter, setarrangementFilter] = useState("all");
     const [applicationPendingDeletion, setApplicationPendingDeletion] = useState(null);
     const [deleteState, setDeleteState] = useState("idle");     // "idle" || "loading" || "success"
 
+    const statusFilter = searchParams.get("status") || "all";
+    const arrangementFilter = searchParams.get("arrangement") || "all";
+
     const deleteTriggerRef = useRef(null);
-    const tableRef = useRef(null);
 
-    const { data: session, status } = useSession();
-
-    const isAdmin = session?.user?.role === "admin";
-    const isLoadingSession = status === "loading";
 
     const filteredApplications = applications.filter((app) => {
         const statusMatch = statusFilter === "all" || app.applicationStatus === statusFilter;
@@ -33,14 +30,15 @@ export default function ApplicationsClient({ applications }) {
         return statusMatch && arrangementMatch;
     })
 
-    // // To set Timeout for testing the skeleton
-    // useEffect(() => {
-    //     const timer = setTimeout(() => {
-    //         setIsLoading(false);
-    //     }, 2000);
+    const updateQueryParams = (updates) => {
+        const params = new URLSearchParams(searchParams.toString());
 
-    //     return () => clearTimeout(timer);
-    // }, []);
+        Object.entries(updates).forEach(([key, value]) => {
+            params.set(key, value);
+        });
+
+        router.push(`${pathname}?${params.toString()}`);
+    };
 
     useEffect(() => {
         if (applications) {
@@ -120,9 +118,9 @@ export default function ApplicationsClient({ applications }) {
                         Work Applications
                     </h1>
 
-                    {!isLoadingSession && isAdmin && (
+                    {isAdmin && (
                         <Link
-                            href="/applications/new"
+                            href="/admin/applications/new"
                             className="inline-flex items-center bg-blue-900 hover:bg-blue-800 text-white px-6 py-2 rounded font-medium text-sm"
                         >
                             Add Data
@@ -134,8 +132,18 @@ export default function ApplicationsClient({ applications }) {
                     <ApplicationsFilters
                         statusFilter={statusFilter}
                         arrangementFilter={arrangementFilter}
-                        onStatusChange={setStatusFilter}
-                        onArrangementChange={setarrangementFilter}
+                        onStatusChange={(value) => 
+                            updateQueryParams({
+                                status: value,
+                                page: 1,
+                            })
+                        }
+                        onArrangementChange={(value) =>
+                            updateQueryParams({
+                                arrangement: value,
+                                page: 1,
+                            })
+                        }
                     />
                 </div>
 
@@ -144,12 +152,47 @@ export default function ApplicationsClient({ applications }) {
                         applications={filteredApplications}
                         totalCount={applications.length}
                         onClearFilters={handleClearFilters}
-                        isAdmin={!isLoadingSession && isAdmin}
+                        isAdmin={isAdmin}
                         onDelete={handleDeleteRequest}
                     />
                 </div>
+                {pagination && pagination.totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-4 mt-6">
+                        <button
+                            disabled={pagination.currentPage === 1}
+                            onClick={() =>
+                                updateQueryParams({ page: pagination.currentPage - 1 })
+                            }
+                            className="
+                                px-4 py-1 border rounded-md font-medium
+                                border border-blue-900 text-blue-900
+                                hover:bg-blue-50 transition-colors
+                                disabled:opacity-40 disabled:cursor-not-allowed disabled:hover-bg-transparent
+                                "
+                        >
+                            Previous
+                        </button>
+                        <span>
+                            Page {pagination.currentPage} of {pagination.totalPages}
+                        </span>
+                        <button
+                            disabled={pagination.currentPage === pagination.totalPages}
+                            onClick={() =>
+                                updateQueryParams({ page: pagination.currentPage + 1 })
+                            }
+                            className="
+                                px-4 py-1 border rounded-md font-medium
+                                border border-blue-900 text-blue-900
+                                hover:bg-blue-50 transition-colors
+                                disabled:opacity-40 disabled:cursor-not-allowed disabled:hover-bg-transparent
+                                "
+                        >
+                            Next
+                        </button>
+                    </div>
+                )}
                 <>
-                    {!isLoadingSession && (<ConfirmDeleteModal
+                    <ConfirmDeleteModal
                         open={Boolean(applicationPendingDeletion)}
                         state={deleteState}
                         title="Delete Application?"
@@ -170,7 +213,7 @@ export default function ApplicationsClient({ applications }) {
                         isLoading={deleteState === "loading"}
                         onConfirm={handleDeleteConfirmation}
                         onCancel={handleDeleteCancellation}
-                    />)}
+                    />
                 </>
             </div>
         </div>

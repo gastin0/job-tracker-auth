@@ -5,8 +5,7 @@ export default auth((req) => {
     const pathname = req.nextUrl.pathname;
 
     const isAdminRoute =
-        pathname.startsWith("/applications/new") ||
-        pathname.startsWith("/applications/edit");
+        pathname.startsWith("/admin");
 
     if (!isAdminRoute) {
         return NextResponse.next();
@@ -25,7 +24,6 @@ export default auth((req) => {
 
 export const config = {
     matcher: [
-        "/applications/new",
-        "/applications/edit/:path*",
+        "/admin/:path*"
     ],
 };

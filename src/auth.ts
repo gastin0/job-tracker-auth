@@ -18,44 +18,56 @@ export const {
         Credentials({
             name: "Credentials",
             credentials: {
-                email: { label: "email", type: "email" },
+                username: { label: "username", type: "text" },
                 password: { label: "password", type: "password" },
             },
 
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) {
+                if (!credentials?.username || !credentials?.password) {
                     return null;
                 }
 
-                const client = await clientPromise;
-                const db = client.db();
+                // const client = await clientPromise;
+                // const db = client.db();
 
-                const user = await db
-                    .collection("users")
-                    .findOne({ email: credentials.email });
+                // const user = await db
+                //     .collection("users")
+                //     .findOne({ email: credentials.adminUserInput });
 
-                if (!user) {
-                    return null;
+
+
+                if (credentials.username === process.env.ADMIN_USERNAME &&
+                    credentials.password === process.env.ADMIN_PASSWORD
+                ) {
+                    return {
+                        id: "admin",
+                        name: "Admin",
+                        username: process.env.ADMIN_USERNAME,
+                        role: "admin",
+                    };
                 }
 
-                if (typeof credentials.password !== "string") {
-                    return null;
-                }
+                return null;
 
-                const isPasswordValid = await compare(
-                    credentials.password,
-                    user.passwordHash
-                );
+                // if (typeof credentials.adminPasswordInput !== "string") {
+                //     return null;
+                // }
 
-                if (!isPasswordValid) {
-                    return null;
-                }
+                // const isPasswordValid = await compare(
+                //     credentials.adminPasswordInput,
+                //     user.passwordHash
+                // );
 
-                return {
-                    id: user._id.toString(),
-                    email: user.email,
-                    role: user.role,
-                } satisfies User & { role: "admin" | "user" };
+                // if (!isPasswordValid) {
+                //     return null;
+                // }
+
+                // return {
+                //     id: user._id.toString(),
+                //     adminUserInput: user.adminUserInput,
+                //     role: user.role,
+                // } 
+                // satisfies User & { role: "admin" | "user" };
             },
         }),
     ],
@@ -63,8 +75,9 @@ export const {
     callbacks: {
         async jwt ({ token, user }) {
             if (user) {
-                token.id = user.id,
+                token.id = user.id;
                 token.role = (user as any).role;
+                token.username = (user as any).username;
             }
             return token;
         },
@@ -73,6 +86,7 @@ export const {
             if (session.user){
                 session.user.id = token.id as string;
                 session.user.role = token.role as "admin" | "user";
+                session.user.username = token.username as string;
             }
             return session;
         },

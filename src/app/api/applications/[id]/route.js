@@ -1,62 +1,31 @@
-import { ObjectId } from "mongodb";
-import clientPromise from "@/lib/mongodb";
-import { NextResponse } from "next/server";
+import { updateApplication, deleteApplication, getApplicationById } from "@/lib/applicationsRepo";
 
-export async function GET(req, context) {
-    const { id } = await context.params;
-    console.log("ID:", id);
+export async function GET(request, context) {
+    const params = await context.params;
+    const id = params.id;
 
-    const client = await clientPromise;
-    const db = client.db("job_tracker");
-
-    const application = await db.collection("applications").findOne({
-        _id: new ObjectId(id),
-    });
+    const application = await getApplicationById(id);
 
     if (!application) {
-        return NextResponse.json({ error: "Not found!" }, { status: 404 });
+        return Response.json({ error: "Not found"}, { status: 404 });
     }
 
-    return NextResponse.json({
-        ...application,
-        _id: application._id.toString(),
-    });
+    return Response.json(application);
 }
 
-export async function PUT(req, context) {
-    const { id } = await context.params;
+export async function PUT(request, context) {
+    const body = await request.json();
 
-    const adminSecret = req.headers.get("x-admin-secret");
-    if (adminSecret !== process.env.ADMIN_SECRET) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
+    const params = await context.params;
+    const id = params.id;
 
-    const body = await req.json();
-    const client = await clientPromise;
-    const db = client.db("job_tracker");
-
-    await db.collection("applications").updateOne(
-        { _id: new ObjectId(id) },
-        { $set: body }      
-    );
-
-    return NextResponse.json({ success: true });
+    await updateApplication(id, body);
+    return Response.json({ success: true });
 }
 
-export async function DELETE(req, context) {
-    const { id } = await context.params;
+export async function DELETE(request, context) {
+    const params = await context.params;
 
-    const adminSecret = req.headers.get("x-admin-secret");
-    if (adminSecret !== process.env.ADMIN_SECRET) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const client = await clientPromise; 
-    const db = client.db("job_tracker");
-
-    await db.collection("applications").deleteOne({
-        _id: new ObjectId(id),
-    });
-
-    return NextResponse.json({ success: true });
+    await deleteApplication(params.id);
+    return Response.json({ success: true });
 }
