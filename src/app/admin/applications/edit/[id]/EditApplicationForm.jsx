@@ -26,19 +26,13 @@ export default function EditApplicationForm({ applicationId }) {
                 setIsLoading(true);
                 setError(null);
 
-                console.log("Fetching application with ID: ", applicationId)
-
                 const response = await fetch(`/api/applications/${applicationId}`);
-
-                console.log("Response status: ", response.status)
 
                 if (!response.ok) {
                     throw new Error("Failed to load application data");
                 }
 
                 const applicationData = await response.json();
-
-                console.log("Application Data received:", applicationData)
 
                 setApplicationFormData({
                     companyName: applicationData.companyName || "",

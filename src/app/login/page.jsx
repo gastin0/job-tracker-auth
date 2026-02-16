@@ -26,11 +26,6 @@ export default function AdminLoginPage() {
             redirect: false,
         });
 
-        console.log("Full result object:", result);
-        console.log("result.ok:", result?.ok);
-        console.log("result.error:", result?.error);
-        console.log("result.status:", result?.status);
-
         if (result?.error) {
             setToastVariant("error");
             setToastVisible(true);

@@ -23,7 +23,6 @@ export const {
             },
 
             async authorize(credentials) {
-                console.log("Credentials received: ", credentials);
                 if (!credentials?.username || !credentials?.password) {
                     return null;
                 }
@@ -40,7 +39,6 @@ export const {
                 if (credentials.username === process.env.ADMIN_USERNAME &&
                     credentials.password === process.env.ADMIN_PASSWORD
                 ) {
-                    console.log("Login successful");
                     return {
                         id: "admin",
                         name: "Admin",
@@ -48,8 +46,6 @@ export const {
                         role: "admin",
                     };
                 }
-
-                console.log("Login failed - invalid credentials")
 
                 return null;
 
