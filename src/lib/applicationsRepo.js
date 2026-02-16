@@ -1,11 +1,13 @@
 import clientPromise from "./mongodb";
 import { ObjectId } from "mongodb";
+import connectToDatabase from "./mongodb";
 
 const DATABASE_NAME = "job_tracker";
 const COLLECTION_NAME = "applications";
 
 async function getCollection() {
-    const client = await clientPromise;
+    const client = await connectToDatabase();
+    
     return client
         .db(DATABASE_NAME)
         .collection(COLLECTION_NAME)
