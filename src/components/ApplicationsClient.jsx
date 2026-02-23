@@ -22,14 +22,6 @@ export default function ApplicationsClient({ applications, isAdmin, pagination, 
 
     const deleteTriggerRef = useRef(null);
 
-
-    const filteredApplications = applications.filter((app) => {
-        const statusMatch = statusFilter === "all" || app.applicationStatus === statusFilter;
-        const arrangementMatch = arrangementFilter === "all" || app.workArrangement === arrangementFilter;
-
-        return statusMatch && arrangementMatch;
-    })
-
     const updateQueryParams = (updates) => {
         const params = new URLSearchParams(searchParams.toString());
 
@@ -106,8 +98,7 @@ export default function ApplicationsClient({ applications, isAdmin, pagination, 
     };
 
     function handleClearFilters() {
-        setStatusFilter("all");
-        setarrangementFilter("all");
+        router.push(pathname);
     }
 
     return (
@@ -149,10 +140,11 @@ export default function ApplicationsClient({ applications, isAdmin, pagination, 
 
                 <div>
                     <ApplicationsTable
-                        applications={filteredApplications}
+                        applications={applications}
                         totalCount={applications.length}
                         onClearFilters={handleClearFilters}
                         isAdmin={isAdmin}
+                        isFiltered={statusFilter !== "all" || arrangementFilter !== "all"}
                         onDelete={handleDeleteRequest}
                     />
                 </div>

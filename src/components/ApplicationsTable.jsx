@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 
-export default function ApplicationsTable({ applications, isAdmin, onDelete, onClearFilters, totalCount }) {
+export default function ApplicationsTable({ applications, isAdmin, onDelete, onClearFilters, isFiltered, totalCount }) {
     function formatStatus(value) {
         return value ? value.replace("_", " ").toUpperCase() : "";
     }
@@ -44,21 +44,12 @@ export default function ApplicationsTable({ applications, isAdmin, onDelete, onC
                         {applications.length === 0 ? (
                             <tr>
                                 <td
-                                    colSpan={isAdmin ? 6 : 5}
+                                    colSpan={isAdmin ? 8 : 7}
                                     className="px-6 py-6 text-center text-gray-700"
                                 >
                                     {
-                                        totalCount === 0 ?
+                                        isFiltered ?
                                         (
-                                            <div className="flex flex-col items-center gap-2">
-                                                <p className="text-sm font-bold">
-                                                    No applications yet
-                                                </p>
-                                                <p className="text-xs">
-                                                    Applications you add will appear here
-                                                </p>
-                                            </div>
-                                        ) : (
                                             <div className="flex flex-col items-center gap-2">
                                                 <p className="text-sm font-bold">
                                                     No applications match the selected filters
@@ -69,6 +60,17 @@ export default function ApplicationsTable({ applications, isAdmin, onDelete, onC
                                                 >
                                                     Clear Filters
                                                 </button>
+                                            </div>
+                                        )
+                                        :
+                                        (
+                                            <div className="flex flex-col items-center gap-2">
+                                                <p className="text-sm font-bold">
+                                                    No applications yet
+                                                </p>
+                                                <p className="text-xs">
+                                                    Applications you add will appear here
+                                                </p>
                                             </div>
                                         )
                                     }
@@ -97,7 +99,7 @@ export default function ApplicationsTable({ applications, isAdmin, onDelete, onC
                                 {isAdmin && (
                                     <td className="px-4 py-4 flex gap-3">
                                         <Link
-                                            href={`applications/edit/${application._id}`}
+                                            href={`applications/edit/${application.id}`}
                                             className="relative group cursor-pointer hover:opacity-80 px-3">
                                             <Image src="/icons/edit.svg" alt="Edit" width={16} height={16}></Image>
                                             <span className="
