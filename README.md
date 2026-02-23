@@ -2,31 +2,35 @@
 
 [![CI](https://github.com/gastin0/job-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/gastin0/job-tracker/actions/workflows/ci.yml) ![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)
 
-A full-stack job application tracking app build with **Next.js App Router**, **MongoDB**, and **Tailwind CSS**. Designed as a portfolio project with clean architecture, RESTful APIs, admin/read-only separation, and thoughtful UX for real-world CRUD workflows.
+A production-minded full-stack job application tracking system built with **Next.js App Router**, **MongoDB**, **NextAuth authentication**, **pagination** and **Docker support**.
+Designed as a portfolio project demonstrating clean architecture, secure admin separation, proper server/client boundaries, and scalable CRUD workflows.
 
-> This project focuses on **clarity, correctness, and user experience**, rather than feature bloat.
+> Focus: **architectural clarity, correctness, and backend-oriented thinking**.
 
 ---
 
 ## ✨ Highlight
 - **Next.js App Router** (Server + Client Components)
+- **NextAuth session-based authentication**
+- **Role-based admin gating**
 - **RESTful API routes** (`GET / POST / PUT / DELETE`)
+- **Server-side pagination**
 - **MongoDB Atlas** with shared `clientPromise` connection pattern
-- **Admin vs read-only UI separation** (client-side gating)
-- **Accessible UX** (keyboard navigation, focus management)
-- **Continous Integration** (automated linting via Github Actions)
-- **Dockerized setup** (via dedicated branch)
+- **Data access abstraction layer** (`applicationRepo`)
+- **Accessible UX** (keyboard & focus management)
+- **Continous Integration (Github Actions)**
+- **Dockerized deployment setup (included in main branch)**
 
 ---
 
 ## 🛠 Tech Stack
 - **Framework**: Next.js (App Router)
+- **Auth**: NextAuth (session-based)
 - **Frontend**: React, Tailwind CSS
-- **Backend**: Next.js API Routes
+- **Backend**: Next.js Route Handlers
 - **Database**: MongoDB Atlas
-- **Styling**: Tailwind CSS
-- **Toolong**: ESLint, PostCSS, GitHub Actions (CI)
-- **Deployment-ready**: Docker
+- **Containerization**: Docker
+- **Tooling**: ESLint, PostCSS, GitHub Actions (CI)
 
 ---
 
@@ -40,8 +44,36 @@ Each application follows a fixed schema:
   applicationStatus: string,
   applicationDate: Date,
   notes: string
+  createdAt: Date,
+  updatedAt: Date
 }
 ```
+- `createdAt` is set on creation.
+- `updatedAt` is updated on every modification.
+- `_id` is serialized to string before returning to client.
+
+---
+
+## 🔐 Authentication & Authorization
+Authentication is implemented via **NextAuth**.
+
+### Public Access
+- `/applications` is publicly accessible (read-only mode).
+
+### Admin Access
+- Create, Edit, and Delete require an authenticated admin session.
+- Admin state derived via `useSession()`.
+- UI gating uses hydration-safe pattern:
+```js
+mounted && isAdmin
+```
+
+### API Protection
+Mutation routes validate session before allowing:
+- POST
+- PUT
+- DELETE
+No reliance on client-side secrets.
 
 ---
 
@@ -53,12 +85,17 @@ Each application follows a fixed schema:
 ### Admin View (CRUD Enabled)
 ![Admin applications view](./screenshots/applications-admin.png)
 
-*Admin-only actions are conditionally enabled on the same route.*
+*Admin controls are conditionally rendered based on session state.*
 
 ### Delete Confirmation Modal
 ![Delete confirmation modal](./screenshots/delete-confirmation-modal.gif)
 
-*Keyboard-accessible destructive action flow with focus management.*
+Accessible destructive flow with:
+- Focus trapping
+- Escape handling
+- Backdrop cancel
+- Controlled delete state machine
+- Focus restoration
 
 ### Application Form
 ![Application form](./screenshots/application-form.png)
@@ -69,84 +106,143 @@ Each application follows a fixed schema:
 
 ---
 
+## 📄 Server-Side Filtering & Pagination
+Filtering and pagination are executed on the server for scalability.
+
+### Server Responsibilities
+- Query parameters derived from searchParams.
+- MongoDB query constructed with:
+  - filter conditions (status, workArrangement, etc.)
+  - `skip`
+  - `limit`
+  - sorted results
+- Total count calculated for proper page navigation
+
+This prevents:
+- Large dataset overfetching
+- Client-side slicing
+- UI/data inconsistency
+
+Designed to scale beyond small portfolio datasets.
+
+---
+
 ## 📂 Project Structure (Simplified)
 ```
-src/
-├─ app/
-│ ├─ applications/
-│ │ ├─ page.jsx               # Public read‑only list (Server)
-│ │ ├─ new/                   # Admin‑only create page
-│ │ └─ edit/[id]/             # Admin‑only edit page
-│ ├─ api/applications/        # REST API routes
-│ └─ layout.jsx
-├─ components/
-│ ├─ ApplicationsClient.jsx   # Client logic + admin gating
-│ ├─ ApplicationsTable.jsx    # Presentational table
-│ ├─ ApplicationsFilters.jsx
-│ └─ ConfirmDeleteModal.jsx   # Accessible delete flow
-├─ lib/mongodb.js             # MongoDB clientPromise
-└─ public/icons/
+.
+├── ARCHITECTURE.md
+├── Dockerfile
+├── README.md
+├── public/
+│   ├── icons/
+│   └── ...
+├── screenshots/
+├── src/
+│   ├── app/
+│   │   ├── applications/          # Public read-only list
+│   │   ├── admin/                 # Admin routes (create/edit/manage)
+│   │   ├── api/
+│   │   │   ├── applications/
+│   │   │   └── auth/[...nextauth]/
+│   │   ├── login/
+│   │   └── layout.js
+│   ├── components/                # UI components & client logic
+│   ├── lib/                       # Repository layer & DB utilities
+│   │   ├── applicationsRepo.js
+│   │   └── mongodb.js
+│   ├── auth.ts                    # NextAuth configuration
+│   ├── proxy.ts
+│   └── types/
+└── configuration files...
 ```
 
 ---
 
 ## 🏗️ Architecture
-This project follows a clear separation between server and client responsibilities using the Next.js App Router.
 
-For detailed architectural decisions, see [ARCHITECTURE.md](./ARCHITECTURE.md).
+### 1. Server Layer
+- Fetches paginated data and filtered data
+- Constructs MongoDB queries based on search parameters
+- Validates authentication for protected routes
+- Executes database operations via repository layer
 
----
+### 2. Client Layer
+- Derives admin session
+- Controls delete modal state machine
+- Uses `router.refresh()` after mutations
 
-## 🔐 Admin vs Read-Only Architecture
-- Public can only view applications
-- Admin features (create, edit, delete) are gated client-side
-- Admin access is derived from a secret stored `localStorage`
-- UI hydration safety via `mounted && isAdmin`
+### 3. Data Access Layer
+`applicationsRepo` abstracts:
+- `getAllApplcations` (with pagination)
+- `createApplication`
+- `updateApplication`
+- `deleteApplication`
+Ensures:
+- ObjectId serialization
+- Timestamp management
+- Clean separation from route handlers
+
+For detailed reasoning and trade-offs, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ---
 
 ## 🗑️ Delete UX
-- Custom confirmation modal (now `window.confirm`)
-- Focus trapping + Escape handling
-- Backdrop click to cancel
-- Delete state machine
+Custom modal implementation includes:
+- Controlled state machine: `idle → confirm → loading → success`
+- Focus trapping
+- Escape handling
+- Backdrop click cancel
 - Artificial success delay
-- Focus restored to triggering button
+- Focus restoration to trigger button
+- Calls `router.refresh()` after deletion
+No `window.confirm`.
 
+Designed to simulate production-grade destructive workflows.
 ---
 
 ## ✅ Continous Integration
-This project uses **GitHub Actions** for automated code quality:
-- Linting runs automatically on every push and pull request
-- ESLint checks ensure code standards are maintained
-- Pre-merge validation prevents broken code from entering main branch
+**GitHub Actions** automatically:
+- Run ESLint on every push
+- Validate pushes and pull requests
+- Prevent broken code from merging
 
-View the [CI workflow](.github/workflows/ci.yml) for details.
+See: [CI workflow](.github/workflows/ci.yml)
 
 ---
 
 ## 🐳 Docker Support
-Docker configuration lives in a dedicated branch:
+Docker configuration is included in the main branch.
+
+### Build & Run
 ```bash
-branch: job-tracker-docker
+docker build -t job-tracker-auth .
+docker run -p 3000:3000 job-tracker-auth
 ```
+Or with compose:
+```bash
+docker-compose up --build
+```
+Environemtn variables must be provided via `.env` or compose file.
 
 ---
 
-## 📌 Project Scope & Trade-offs
+## 📌 Project Scope & Design Decisions
 This project intentionally:
-- Does not include full authentication (JWT/session)
-- Uses admin gating instead of multi-user auth
-- Focuses on architecture, UX, and correctness
-
-These trade-offs were made to prioritize **code clarity and maintainability** within limited scope.
+- Uses session-based authentication instead of JWT tokens
+- Separates server data fetching from client interactivity
+- Implements real pagination instead of client slicing
+- Focuses on **architectural quality** over **feature quantity**
+Deliberately avoids:
+- Multi-user roles
+- OAuth providers (currently single-admin model)
+- Complex caching layers
 
 ---
 
 ## 🚀 Getting Started
 ```bash
 git clone <repository-url>
-cd job-tracker
+cd job-tracker-auth
 npm install
 npm run dev
 ```
@@ -155,15 +251,19 @@ Create a `.env.local` file:
 ```env
 MONGODB_URI=your_mongodb_connection_string
 ADMIN_SECRET=your_admin_secret
+NEXTAUTH_URL=http://localhost:3000
 ```
 
 ---
 
 ## 🧠 Why This Project Exists
-This project was built to demonstrate:
-- Practical full-stack development
-- Understanding of Next.js App Router constraints
-- Clean REST API design
-- UX and accessibility awareness
+This project demonstrates:
+- Backend-oriented full-stack architecture
+- Session-based authentication
+- Proper App Router patterns
+- MongoDB abstraction layering
+- Pagination and scalability thinking
+- Accessible UX implementation
+- Dockerized deployment readiness
 
-It is actively iterated as part of a learning and portfolio process
+It represents a progression from basic CRUD to production-minded system design.
