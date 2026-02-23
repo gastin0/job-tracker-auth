@@ -17,7 +17,7 @@ export async function getApplicationById(id) {
     if (!ObjectId.isValid(id)) {
         return null;
     }
-    
+
     const collection = await getCollection();
 
     const application = await collection.findOne({
@@ -57,10 +57,9 @@ export async function getAllApplications({ page = 1, limit = 10, status, arrange
         .toArray();
 
     return {
-        data: applications.map((application) => ({
-            id: application._id.toString(),
+        data: applications.map(({ _id, ...application}) => ({
+            id: _id.toString(),
             ...application,
-            _id: undefined,
         })),
         pagination: {
             totalCount,
