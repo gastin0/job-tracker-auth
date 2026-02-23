@@ -51,7 +51,7 @@ export default function ApplicationsClient({ applications, isAdmin, pagination, 
     const handleDeleteConfirmation = async () => {
         if (!applicationPendingDeletion) return;
 
-        const applicationId = applicationPendingDeletion._id;
+        const applicationId = applicationPendingDeletion.id;
 
         try {
             setDeleteState("loading");
