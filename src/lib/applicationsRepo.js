@@ -14,6 +14,10 @@ async function getCollection() {
 }
 
 export async function getApplicationById(id) {
+    if (!ObjectId.isValid(id)) {
+        return null;
+    }
+    
     const collection = await getCollection();
 
     const application = await collection.findOne({
