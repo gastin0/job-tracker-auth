@@ -1,6 +1,6 @@
 # Job Application Tracker
 
-[![CI](https://github.com/gastin0/job-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/gastin0/job-tracker/actions/workflows/ci.yml) ![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)
+[![CI](https://github.com/gastin0/job-tracker-auth/actions/workflows/ci.yml/badge.svg)](https://github.com/gastin0/job-tracker-auth/actions/workflows/ci.yml) ![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)
 
 A production-minded full-stack job application tracking system built with **Next.js App Router**, **MongoDB**, **NextAuth authentication**, **pagination** and **Docker support**.
 Designed as a portfolio project demonstrating clean architecture, secure admin separation, proper server/client boundaries, and scalable CRUD workflows.
@@ -250,7 +250,7 @@ npm run dev
 Create a `.env.local` file:
 ```env
 MONGODB_URI=your_mongodb_connection_string
-ADMIN_SECRET=your_admin_secret
+NEXTAUTH_SECRET=your_admin_secret
 NEXTAUTH_URL=http://localhost:3000
 ```
 
