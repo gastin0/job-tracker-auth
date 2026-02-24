@@ -56,7 +56,7 @@ jobs:
           context: .
           push: true
           tags: |
-            gastino/job-tracker-auth:latest
-            gastino/job-tracker-auth:${{ github.sha }}
-            gastino/job-tracker-auth:${{ env.SHORT_SHA }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/job-tracker-auth:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/job-tracker-auth:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/job-tracker-auth:${{ env.SHORT_SHA }}
             
