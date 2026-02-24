@@ -1,0 +1,25 @@
+version: '3.9'
+
+services:
+  mongodb:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+
+  job-tracker-auth:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.production
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+    environment:
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: this-is-super-secret-for-admin
+      MONGODB_URI: mongodb+srv://admin:DBPassadmin890@project0.lysplkh.mongodb.net/job_tracker?retryWrites=true&w=majority
+
+volumes:
+  mongo-data:
