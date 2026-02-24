@@ -25,14 +25,12 @@ export const {
             async authorize(credentials) {
                 await connect();
                 if (!credentials || typeof credentials.username !== "string" || typeof credentials.password !== "string") {
-                    console.log("Invalid credentials shape")
                     return null;
                 }
 
                 const user = await User.findOne({ username: credentials.username });
 
                 if (!user) {
-                    console.log("No user found")
                     return null
 
                 };

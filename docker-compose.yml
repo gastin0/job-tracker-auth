@@ -17,9 +17,10 @@ services:
       - mongodb
     restart: unless-stopped
     environment:
-      NEXTAUTH_URL: http://localhost:3000
-      NEXTAUTH_SECRET: this-is-super-secret-for-admin
-      MONGODB_URI: mongodb+srv://admin:DBPassadmin890@project0.lysplkh.mongodb.net/job_tracker?retryWrites=true&w=majority
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      MONGODB_URI: ${MONGODB_URI}
 
 volumes:
   mongo-data:
+  

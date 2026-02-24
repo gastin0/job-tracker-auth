@@ -18,6 +18,5 @@ export async function connect() {
     }
 
     cached.conn = await cached.promise;
-    console.log("Connected DB:", mongoose.connection.name);
     return cached.conn;
 }
