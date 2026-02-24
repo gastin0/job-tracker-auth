@@ -1,8 +1,8 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { compare } from "bcrypt";
-import clientPromise from "./lib/mongodb";
-import type { User } from "next-auth";
+import User from "./models/User";
+import bcrypt from "bcrypt";
+import { connect } from "./lib/mongoose";
 
 export const {
     auth,
@@ -23,67 +23,49 @@ export const {
             },
 
             async authorize(credentials) {
-                if (!credentials?.username || !credentials?.password) {
+                await connect();
+                if (!credentials || typeof credentials.username !== "string" || typeof credentials.password !== "string") {
+                    console.log("Invalid credentials shape")
                     return null;
                 }
 
-                // const client = await clientPromise;
-                // const db = client.db();
+                const user = await User.findOne({ username: credentials.username });
 
-                // const user = await db
-                //     .collection("users")
-                //     .findOne({ email: credentials.adminUserInput });
+                if (!user) {
+                    console.log("No user found")
+                    return null
 
+                };
 
+                const isValid = await bcrypt.compare(
+                    credentials.password,
+                    user.password
+                );
 
-                if (credentials.username === process.env.ADMIN_USERNAME &&
-                    credentials.password === process.env.ADMIN_PASSWORD
-                ) {
-                    return {
-                        id: "admin",
-                        name: "Admin",
-                        username: process.env.ADMIN_USERNAME,
-                        role: "admin",
-                    };
-                }
+                if (!isValid) return null;
 
-                return null;
-
-                // if (typeof credentials.adminPasswordInput !== "string") {
-                //     return null;
-                // }
-
-                // const isPasswordValid = await compare(
-                //     credentials.adminPasswordInput,
-                //     user.passwordHash
-                // );
-
-                // if (!isPasswordValid) {
-                //     return null;
-                // }
-
-                // return {
-                //     id: user._id.toString(),
-                //     adminUserInput: user.adminUserInput,
-                //     role: user.role,
-                // } 
-                // satisfies User & { role: "admin" | "user" };
+                return {
+                    id: user._id.toString(),
+                    name: "Admin",
+                    username: user.username,
+                    role: user.role,
+                };
             },
         }),
     ],
 
     callbacks: {
-        async jwt ({ token, user }) {
+        async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
-                token.role = (user as any).role;
-                token.username = (user as any).username;
+                token.role = user.role;
+                token.username = user.username;
             }
             return token;
         },
 
-        async session ({ session, token }) {
-            if (session.user){
+        async session({ session, token }) {
+            if (session.user) {
                 session.user.id = token.id as string;
                 session.user.role = token.role as "admin" | "user";
                 session.user.username = token.username as string;
