@@ -103,6 +103,11 @@ Accessible destructive flow with:
 ### Application Form
 ![Application form](./screenshots/application-form.png)
 
+### Data Filtering
+![Data filtering demo](./screenshots/data-filters.gif)
+Server-side filtering by status and work arrangement.
+Filters update query parameters and trigger fresh server-rendered results.
+
 ### Empty State
 ![Empty state](./screenshots/empty-state.png)
 *Empty state clearly indicates that no results match the active filters and provide a reset action.*
@@ -201,6 +206,7 @@ Custom modal implementation includes:
 No `window.confirm`.
 
 Designed to simulate production-grade destructive workflows.
+
 ---
 
 ## ✅ Continuous Integration
