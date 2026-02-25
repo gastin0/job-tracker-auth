@@ -75,13 +75,15 @@ Client does not perform database querying logic.
 ---
 
 ## 4. Authentication & Authorization
-Authentication is implemented using **NextAuth (session-based)**.
+Authentication is implemented using **NextAuth (session-based)** with credentials validated against user records stored in MongoDB.
+Password are hashed using bcrypt and verified via secure hash comparison during login.
 
 ### Session Model
 - Session stored in HTTP-only cookies
-- Admin access derived from server-validated session
+- Admin access derived from database-validated session
 - No client-side secrets
 - No localStorage-based auth
+- Passwords are never stored in plaintext (bcrypt hashing)
 
 ### UI Gating Pattern
 Hydration-safe rendering:
@@ -112,7 +114,7 @@ Supported operations:
 
 Authentication route:
 ```
-/api/auth/[...nextAuth]
+/api/auth/[...nextauth]
 ```
 Routes remain thin and delegate data logic to the repository layer.
 ---
@@ -129,7 +131,7 @@ Responsibilities:
 
 This provides:
 - Cleaner route handlers
-- centralized data logic
+- Centralized data logic
 - Easier extensibility
 
 ---
@@ -155,7 +157,7 @@ This provides:
 ---
 
 ## 8. Database Access
-Required variables:
+Database:
 - MongoDB Atlas
 - Shared `clientPromise` pattern
 - Global caching in development to prevent multiple connections
@@ -186,13 +188,13 @@ Filtering and pagination are combined within a single query pipeline.
 Custom modal-driven destructive flow:
 State machine:
 ```
-idle → confirm → loading → successs
+idle → confirm → loading → success
 ```
 Features:
 - Focus trapping
 - Escape handling
 - Backdrop cancellation
-- Aritificial success delay
+- Artificial success delay
 - Focus restoration
 - `router.refresh()` after deletion
 Designed to mimic production-grade UX patterns.
@@ -215,6 +217,7 @@ Docker support is included in main branch.
 - Optional `docker-compose.yml`
 - Environment variables injected at runtime
 This allows consistent development and deployment environments.
+Docker image is automatically built and published to Docker Hub via GitHub Actions on successful push to `main`.
 
 ---
 

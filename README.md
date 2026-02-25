@@ -1,6 +1,6 @@
 # Job Application Tracker
 
-[![CI](https://github.com/gastin0/job-tracker-auth/actions/workflows/ci.yml/badge.svg)](https://github.com/gastin0/job-tracker-auth/actions/workflows/ci.yml) ![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)
+[![CI Pipeline](https://github.com/gastin0/job-tracker-auth/actions/workflows/ci.yml/badge.svg)](https://github.com/gastin0/job-tracker-auth/actions/workflows/ci.yml) ![Docker](https://img.shields.io/docker/pulls/gastin0/job-tracker-auth) ![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)
 
 A production-minded full-stack job application tracking system built with **Next.js App Router**, **MongoDB**, **NextAuth authentication**, **pagination** and **Docker support**.
 Designed as a portfolio project demonstrating clean architecture, secure admin separation, proper server/client boundaries, and scalable CRUD workflows.
@@ -25,7 +25,7 @@ Designed as a portfolio project demonstrating clean architecture, secure admin s
 
 ## 🛠 Tech Stack
 - **Framework**: Next.js (App Router)
-- **Auth**: NextAuth (session-based)
+- **Auth**: NextAuth (session-based, bcrypt-hased credentials)
 - **Frontend**: React, Tailwind CSS
 - **Backend**: Next.js Route Handlers
 - **Database**: MongoDB Atlas
@@ -43,7 +43,7 @@ Each application follows a fixed schema:
   workArrangement: string,
   applicationStatus: string,
   applicationDate: Date,
-  notes: string
+  notes: string,
   createdAt: Date,
   updatedAt: Date
 }
@@ -55,7 +55,10 @@ Each application follows a fixed schema:
 ---
 
 ## 🔐 Authentication & Authorization
-Authentication is implemented via **NextAuth**.
+Authentication is implemented via **NextAuth**, with user credentials stored and validated against MongoDB.
+No hardcoded admin credentials or email-based env configuration are used.
+- Passwords are securely hashed using bcrypt before storage
+- Credential comparison uses bcrypt hash verification
 
 ### Public Access
 - `/applications` is publicly accessible (read-only mode).
@@ -173,7 +176,7 @@ Designed to scale beyond small portfolio datasets.
 
 ### 3. Data Access Layer
 `applicationsRepo` abstracts:
-- `getAllApplcations` (with pagination)
+- `getAllApplications` (with pagination)
 - `createApplication`
 - `updateApplication`
 - `deleteApplication`
@@ -200,29 +203,37 @@ No `window.confirm`.
 Designed to simulate production-grade destructive workflows.
 ---
 
-## ✅ Continous Integration
-**GitHub Actions** automatically:
-- Run ESLint on every push
-- Validate pushes and pull requests
-- Prevent broken code from merging
+## ✅ Continuous Integration
+Github Actions pipeline runs on every push to `main`:
+- Run ESLint
+- Install dependencies
+- Execute production build
+- Build Docker image
+- Push Docker image to Docker Hub (on successful build)
+
+Ensures:
+- Code quality validation
+- Build verification
+- Deployment artifact consistency
 
 See: [CI workflow](.github/workflows/ci.yml)
 
 ---
 
 ## 🐳 Docker Support
-Docker configuration is included in the main branch.
+Docker images are available on **Docker Hub**. Configuration is included in the main branch.
 
 ### Build & Run
 ```bash
-docker build -t job-tracker-auth .
-docker run -p 3000:3000 job-tracker-auth
+docker pull gastin0/job-tracker-auth:latest
+docker run -p 3000:3000 --env-file .env.production gastin0/job-tracker-auth:latest
 ```
 Or with compose:
 ```bash
 docker-compose up --build
 ```
-Environemtn variables must be provided via `.env` or compose file.
+Environment variables must be provided via `.env` or docker-compose file.
+The image is automatically built and published via GitHub Actions CI pipepline.
 
 ---
 
